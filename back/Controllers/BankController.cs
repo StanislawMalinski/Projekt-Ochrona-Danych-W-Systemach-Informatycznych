@@ -29,10 +29,10 @@ public class BankController : ControllerBase
     }
 
     [HttpPost("register")]
-    public IActionResult Login([FromBody] RegisterRequest request)
+    public IActionResult register([FromBody] RegisterRequest request)
     {
         var c = HttpContext;
-        var response = _bankService.Login(request);
+        var response = _bankService.Register(request);
         return Ok(response);
     } 
 

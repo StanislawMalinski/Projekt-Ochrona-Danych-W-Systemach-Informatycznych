@@ -1,8 +1,9 @@
 
-namespace projekt.Models.Dots;
+namespace projekt.Models.Dtos;
 
 public class Transfer{
-    public string AccountNumber {get; set;};
-    public string RecipentAccountNumber {get; set;};
-    public decimal Value {get; set;};
+    public int Id {get; set;}
+    public string AccountNumber {get; set;}
+    public string RecipentAccountNumber {get; set;}
+    public decimal Value {get; set;}
 }

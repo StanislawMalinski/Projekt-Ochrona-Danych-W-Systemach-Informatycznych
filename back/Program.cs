@@ -1,7 +1,13 @@
 using projekt.Serivces;
+using projekt.Db.BankContext;
+using projekt.Db.Repository;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+var config = builder.Configuration;
 
+String connectionString = config.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<BankDbContext>(options => options.UseSqlite(connectionString));
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -9,6 +15,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IBankService, BankService>();
 builder.Services.AddScoped<IActivityService, ActivityService>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<ITransferRepository, TransferRepository>();
+
+
 
 var app = builder.Build();
 
