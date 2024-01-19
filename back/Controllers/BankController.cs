@@ -28,6 +28,14 @@ public class BankController : ControllerBase
         return Ok(response);
     }
 
+    [HttpPost("register")]
+    public IActionResult Login([FromBody] RegisterRequest request)
+    {
+        var c = HttpContext;
+        var response = _bankService.Login(request);
+        return Ok(response);
+    } 
+
     [HttpPost("pass-change")]
     public IActionResult PassChange([FromBody] PassChangeRequest request)
     {
