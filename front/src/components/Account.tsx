@@ -1,7 +1,12 @@
-import TransferWindow from "./TransferWindow";
+import PasswordInput from "./PasswordInput";
 
+interface AccountProps {
+    newTransfer: (arg: void) => void;
+    logOut: (arg: void) => void;
+}
 
-function Account() {
+function Account(props: AccountProps) {
+    const {newTransfer, logOut} = props;
     var response = {
         "AccountNumber": "123456789", 
         "Balance": "1000.00", 
@@ -10,10 +15,6 @@ function Account() {
             {"AccountNumber": "123456789", "RecipentAccountNumber": "987654321", "Value": "1000.00"},
             {"AccountNumber": "987654321", "RecipentAccountNumber": "123456789", "Value": "100.00"}
         ]};
-
-        function newTransfer() {
-            
-        }
 
     return (
         <div>
@@ -48,10 +49,8 @@ function Account() {
                 </tr>
                 )}
             </table>
-
-            <TransferWindow/>
-                
-            <button onClick={newTransfer}>New Transfer</button>
+            <button onClick={() => newTransfer()}>New Transfer</button>
+            <button onClick={() => logOut()}>LogOut</button>
         </div>
     )
 }
