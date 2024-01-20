@@ -24,10 +24,16 @@ function AuthWindow(props: AuthWindowProps) {
 
     const auth = () => {
         if (hasAc) {
-            console.log("login")
             login(loginRequest)
+            .then((response) => {
+                if (response) {
+                    saveCredentials(loginRequest.email, loginRequest.password)
+                    setLogged(true)
+                } else {
+                    console.log("Error in login")
+                }
+            });
         } else {
-            console.log("register")
             register(registerRequest)
         }
     }
