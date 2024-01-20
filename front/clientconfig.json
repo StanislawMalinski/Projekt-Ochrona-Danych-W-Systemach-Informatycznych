@@ -1,0 +1,41 @@
+{
+    "development":
+    {
+        "server":{
+        "protocol" : "http",
+        "host": "localhost",
+        "port": "5106"
+        },
+        "host": {
+            "protocol" : "http",
+            "host": "localhost",
+            "port": "5000"
+        }
+    },
+    "production":
+    {
+        "server":{
+            "protocol" : "https",
+            "host": "0.0.0.0",
+            "port": "5106"
+        },
+        "host": {
+            "protocol" : "http",
+            "host": "localhost",
+            "port": "5000"
+        }
+    },
+    "baseUrl": "/bank",
+    "urls":
+    {
+        "login": "/login",
+        "register": "/register",
+        "passwordchange": "/pass-change",
+        "transfer": "/transfer",
+        "account": "/account"
+    },
+    "key":{
+        "iterations": 1000,
+        "keySize": 128
+    }
+}

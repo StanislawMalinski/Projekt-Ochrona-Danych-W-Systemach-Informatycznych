@@ -4,8 +4,9 @@ namespace projekt.Db.Repository;
 
 public interface IAccountRepository
 {
-    Account GetAccount(string accountNumber);
-    Account ChangePassword(PassChangeRequest request);
-    Account Register(RegisterRequest request);
-    Account Login(LoginRequest request);
+    public Account GetAccount(string accountNumber);
+    public Account ChangePassword(PassChangeRequest request);
+    public Account Register(RegisterRequest request);
+    public bool validUser(LoginRequest request);
+    public bool CheckIfAccountExists(string Email);
 }

@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using projekt.Models.Requests;
 using projekt.Serivces;
 
+using System.Text.Json;
+
 namespace projekt.Controllers;
 
 [ApiController]
@@ -22,8 +24,6 @@ public class BankController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request)
     {
-        var c = HttpContext;
-        Console.WriteLine(c);
         var response = _bankService.Login(request);
         return Ok(response);
     }
@@ -31,7 +31,6 @@ public class BankController : ControllerBase
     [HttpPost("register")]
     public IActionResult register([FromBody] RegisterRequest request)
     {
-        var c = HttpContext;
         var response = _bankService.Register(request);
         return Ok(response);
     } 

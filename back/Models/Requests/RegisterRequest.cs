@@ -5,14 +5,10 @@ namespace projekt.Models.Requests
     {
         public RegisterRequest()
         {
-            AccountNumber = "";
-            RecipientAccountNumber = "";
-            Amount = 0;
+            Email = "";
             Password = "";
         }
-        public required string AccountNumber { get; set; }
-        public required string RecipientAccountNumber { get; set; }
-        public required decimal Amount { get; set; }
+        public required string Email { get; set; }
         public required string Password { get; set; }
     }
 }

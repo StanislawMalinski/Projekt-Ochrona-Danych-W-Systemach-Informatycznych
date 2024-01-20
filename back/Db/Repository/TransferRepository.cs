@@ -15,4 +15,11 @@ public class TransferRepository : ITransferRepository{
         throw new NotImplementedException();
     }
 
+
+    public List<Transfer> GetHistory(string accountNumber){
+        var toMe = _bankDbContext.Transfers.Where(t => t.AccountNumber == accountNumber).ToList();
+        var fromMe = _bankDbContext.Transfers.Where(t => t.RecipentAccountNumber== accountNumber).ToList();
+        var history = toMe.Concat(fromMe).ToList();
+        return history;
+    }
 }

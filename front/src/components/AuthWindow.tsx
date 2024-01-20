@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import '../styles/AuthWindow.css'
-import PasswordInput from './PasswordInput';
+import PassComp from './password/PassComp';
+import LoginComp from './auth/LoginComp';
+import RegisterComp from './auth/RegisterComp';
+import { encryptWithAesKey, decryptWithAesKey, saveCredentials, getCredentials } from '../utils/Cipher';
+
+import {login, register} from '../Client';
 
 
 interface AuthWindowProps {
@@ -12,6 +17,21 @@ function AuthWindow(props: AuthWindowProps) {
     const {logged, setLogged} = props;
     const [hasAc, setHasAc] = useState(true);
 
+    const [registerRequest, setRegisterRequest] = useState({email: "", password: ""})
+    const [loginRequest, setLoginRequest] = useState({email: "", password: ""})
+
+    const [disableRegistery, setDisableRegistery] = useState(true)
+
+    const auth = () => {
+        if (hasAc) {
+            console.log("login")
+            login(loginRequest)
+        } else {
+            console.log("register")
+            register(registerRequest)
+        }
+    }
+
     var content = hasAc ? "Login" : "Register"
     var goTo = hasAc ? "Register" : "Login"
 
@@ -21,8 +41,15 @@ function AuthWindow(props: AuthWindowProps) {
         <div className='auth-window'>
             <div className='auth-window-inner'>
                 <h1>{content}</h1>
-                <PasswordInput/>
+                {hasAc ? 
+                    <LoginComp setLoginRequest={setLoginRequest}/> 
+                    : 
+                    <RegisterComp setRegisterRequest={setRegisterRequest} setDisableRegistery={setDisableRegistery}/>
+                }
                 <button onClick={() => setHasAc(!hasAc)}>{goTo}</button>
+                <button onClick={() => auth()} disabled={disableRegistery} >{content}</button>
+
+
                 <button onClick={() => setLogged(!logged)}>"Login"</button>
             </div>
         </div>

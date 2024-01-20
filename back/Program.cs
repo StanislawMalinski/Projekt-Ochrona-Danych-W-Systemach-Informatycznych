@@ -15,10 +15,17 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IBankService, BankService>();
 builder.Services.AddScoped<IActivityService, ActivityService>();
+
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ITransferRepository, TransferRepository>();
+builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
 
-
+var myPolicy = "MyCorsePolicy";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(myPolicy, builder =>
+    builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+});
 
 var app = builder.Build();
 
@@ -29,6 +36,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 } else {
+    app.UseCors(myPolicy);
     app.UseSwagger();
     app.UseSwaggerUI();
 }

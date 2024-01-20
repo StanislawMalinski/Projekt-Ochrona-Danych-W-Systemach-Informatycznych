@@ -4,6 +4,7 @@ namespace projekt.Db.Repository
 {
     public interface ITransferRepository
     {
-        Transfer NewTransfer(Transfer transfer);
+        public Transfer NewTransfer(Transfer transfer);
+        public List<Transfer> GetHistory(string accountNumber);
     }
 }
