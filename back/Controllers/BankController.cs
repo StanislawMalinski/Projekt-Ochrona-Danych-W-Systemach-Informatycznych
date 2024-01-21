@@ -89,6 +89,6 @@ public class BankController : ControllerBase
     public IActionResult GetPublicKey()
     {
         _activityService.LogActivity(ActivityType.Login, true);
-        return Ok(null);
+        return Ok(CryptoService.GetPublicKey());
     }
 }
