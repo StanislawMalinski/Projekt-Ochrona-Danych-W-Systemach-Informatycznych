@@ -17,6 +17,7 @@
 }
 
 .transfer-window-inner {
+
     position: absolute;
     left: 50%;
     top: 50%;
@@ -29,6 +30,7 @@
 }
 
 .transfer-form {
+    justify-items: center;
     display: grid;
 }
 

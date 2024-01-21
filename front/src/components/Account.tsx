@@ -1,33 +1,19 @@
-import { useEffect, useState } from "react";
-import { account } from "../Client";
-
 import '../styles/Account.css';
 
 interface AccountProps {
     newTransfer: (arg: void) => void;
+    credentials: any;
     logOut: (arg: void) => void;
 }
 
 function Account(props: AccountProps) {
-    const {newTransfer, logOut} = props;
-
-    const [response, setResponse] = useState({accountNumber: "", balance: 0, history: [{accountNumber: "", recipentAccountNumber: "",recipent:"" ,title:"", value: 0}]});
-
+    const {newTransfer, logOut, credentials} = props;
     
-    const accountRequest = {"accountNumber": "123456789"}; 
-    
-    useEffect(() => {
-        account(accountRequest)
-            .then((resp) => {setResponse(resp); console.log(resp);})
-            .catch((error) => {console.log(error);});
-    }, []);
-
-    
-    return (
+    return (credentials ? 
         <>
             <h1>Account</h1>
-            <p>Account Number: {response.accountNumber}</p>
-            <p>Balance: {response.balance.toFixed(2)}</p>
+            <p>Account Number: {credentials.accountNumber}</p>
+            <p>Balance: {credentials.balance.toFixed(2)}</p>
 
             <div className="transfer-history-container">
                 <table className="transfer-history">
@@ -44,21 +30,21 @@ function Account(props: AccountProps) {
                             </th>
                         </tr>
 
-                        {response.history.map((item, index) =>
+                        {credentials.history.map((item: any, index: number) =>
                         <tr key={index}>
                             <td className="transfer-history-cell transfer-value">
                                 <p>{item.accountNumber}</p>
                             </td>    
                             <td className="transfer-history-cell transfer-value">
-                                <p>{item.recipentAccountNumber}</p>
+                                <p>{item.recipent ? item.recipent : item.recipentAccountNumber}</p>
                             </td>
                             <td className="transfer-history-cell transfer-value">
                                 <p>{item.title}</p>
                             </td>
                             <td className="transfer-history-cell transfer-value">
-                                <p className={item.accountNumber === accountRequest.accountNumber 
+                                <p className={item.accountNumber === credentials.accountNumber 
                                     ? 'taken' : 'received'}>
-                                    {item.accountNumber === accountRequest.accountNumber ? '-':''}{item.value.toFixed(2)}
+                                    {item.accountNumber === credentials.accountNumber ? '-':''}{item.value.toFixed(2)}
                                 </p>
                             </td>
                         </tr>
@@ -68,7 +54,8 @@ function Account(props: AccountProps) {
             </div>
             <button onClick={() => newTransfer()}>New Transfer</button>
             <button onClick={() => logOut()}>LogOut</button>
-        </>
+        </>:
+        <>  </>
     )
 }
 

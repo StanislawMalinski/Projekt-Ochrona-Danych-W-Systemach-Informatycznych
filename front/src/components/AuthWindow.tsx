@@ -1,62 +1,105 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import '../styles/AuthWindow.css'
-import PassComp from './password/PassComp';
 import LoginComp from './auth/LoginComp';
 import RegisterComp from './auth/RegisterComp';
-import { encryptWithAesKey, decryptWithAesKey, saveCredentials, getCredentials } from '../utils/Cipher';
 
 import {login, register} from '../Client';
+import { saveCredentials } from '../utils/Cipher';
 
 
 interface AuthWindowProps {
     logged: boolean;
     setLogged: (arg: boolean) => void;
+    setAccount: (arg: {accountNumber: string, balance: number, history: {accountNumber: string, recipientAccountNumber: string, recipient: string, title: string, value: number}[]}) => void;
 }
 
 function AuthWindow(props: AuthWindowProps) {
-    const {logged, setLogged} = props;
-    const [hasAc, setHasAc] = useState(true);
+    const {logged, setLogged, setAccount} = props;
+    const [mode, setMode] = useState("login");
+    const [content, setContent] = useState(<></>);
 
     const [registerRequest, setRegisterRequest] = useState({email: "", password: ""})
     const [loginRequest, setLoginRequest] = useState({email: "", password: ""})
 
-    const [disableRegistery, setDisableRegistery] = useState(true)
+    const [message, setMessage] = useState("");
+    const [disabled, setDisabled] = useState(false);
 
-    const auth = () => {
-        if (hasAc) {
-            login(loginRequest)
-            .then((response) => {
-                if (response) {
-                    saveCredentials(loginRequest.email, loginRequest.password)
-                    setLogged(true)
-                } else {
-                    console.log("Error in login")
-                }
-            });
-        } else {
-            register(registerRequest)
+    const auth = (m: string ) => {
+        console.log(m)
+        switch (m) {
+            case "login":
+                login(loginRequest)
+                .then((response) => {
+                    if (response.success) {
+                        saveCredentials(loginRequest.email, loginRequest.password)
+                        setLogged(true);
+                        setAccount(response);
+                    } else {
+                        setMessage(response.message);
+                    }
+                });
+                break;
+            case "register":
+                register(registerRequest)
+                .then((response) => {
+                    if (response.success) {
+                        saveCredentials(registerRequest.email, registerRequest.password)
+                        setLogged(true);
+                        setAccount(response);
+                    } else {
+                        setMessage(response.message);
+                    }
+                });
+            break;
+            case "password":
+                break;
         }
     }
 
-    var content = hasAc ? "Login" : "Register"
-    var goTo = hasAc ? "Register" : "Login"
+    var reg = (<>
+        <RegisterComp setRegisterRequest={setRegisterRequest} setMessage={(e) => setMessage(e)} setDisabled={(e) => setDisabled(e)}/>
+        <p className='login-option' onClick={() => setMode("login")}>You have an account?</p>
+        </>)
+    var log = (<>
+        <LoginComp setLoginRequest={setLoginRequest}/>
+        <p className='login-option' onClick={() => setMode("password")}>Forgot password?</p>
+        <p className='login-option' onClick={() => setMode("register")}>Sign in</p>
+        </>);
+    var pass = (<>dupa
+        <p className='login-option' onClick={() => setMode("login")}>Cancle</p>
+        </>);
+
+    var switchMode = () => {
+        setMessage("");
+        let cc;
+        switch (mode) {
+            case "register":
+                cc = reg;
+                break;
+            case "password":
+                cc = pass;
+                break;
+            case "login":
+            default:
+                cc = log;
+                break;
+        }
+        return cc;
+    }
+
+    useEffect(() => {
+        setContent(switchMode());
+        setMessage("");
+    }, [mode]);
 
     return (<> {logged ?
         <></>
         :
         <div className='auth-window'>
             <div className='auth-window-inner'>
-                <h1>{content}</h1>
-                {hasAc ? 
-                    <LoginComp setLoginRequest={setLoginRequest}/> 
-                    : 
-                    <RegisterComp setRegisterRequest={setRegisterRequest} setDisableRegistery={setDisableRegistery}/>
-                }
-                <button onClick={() => setHasAc(!hasAc)}>{goTo}</button>
-                <button onClick={() => auth()} disabled={disableRegistery} >{content}</button>
-
-
-                <button onClick={() => setLogged(!logged)}>"Login"</button>
+                {content}
+                <p className="warn-message">{message}</p>
+                <button onClick={() => auth(mode)} >{mode}</button>
             </div>
         </div>
         }

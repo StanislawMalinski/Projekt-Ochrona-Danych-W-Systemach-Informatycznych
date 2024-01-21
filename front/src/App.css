@@ -5,6 +5,23 @@
   text-align: center;
 }
 
+* {
+  color: gray;
+}
+
+input {
+  border: 1px solid gray;
+  height: 30px;
+  font-size: large;
+  border-radius: 4px;
+  padding: 0.5rem;
+  margin: 5px;
+}
+
+button {
+  margin: 5px;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

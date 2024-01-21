@@ -33,8 +33,6 @@ function login(body: any) {
     }).then((response) => {
         if (response.status === 200) {
             return response.json();
-        } else {
-            console.log('Error in login');
         }
     }).catch((error) => {
         console.log(error);
@@ -53,8 +51,6 @@ function register(body: any) {
     }).then((response) => {
         if (response.status === 200) {
             return response.json();
-        } else {
-            console.log('Error in register');
         }
     }).catch((error) => {
         console.log(error);
@@ -72,8 +68,6 @@ function passwordchange(body: any) {
     }).then((response) => {
         if (response.status === 200) {
             return response.json();
-        } else {
-            console.log('Error in passwordchange');
         }
     }).catch((error) => {
         console.log(error);
@@ -91,8 +85,6 @@ function transfer(body: any) {
     }).then((response) => {
         if (response.status === 200) {
             return response.json();
-        } else {
-            console.log('Error in transfer');
         }
     }).catch((error) => {
         console.log(error);
@@ -111,8 +103,6 @@ function account(body: any) {
         console.log(response);
         if (response.status === 200) {
             return response.json();
-        } else {
-            console.log('Error in account');
         }
     }).catch((error) => {
         console.log(error);

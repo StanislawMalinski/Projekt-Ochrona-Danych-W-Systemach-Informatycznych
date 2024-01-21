@@ -2,7 +2,6 @@ import { sha256, sha384} from "crypto-hash";
 import  secureLocalStorage  from  "react-secure-storage";
 import config from "../../clientconfig.json"
 import { useState } from "react";
-import * as CryptoJS from "react-native-crypto-js";
 
 const iv_ = "0535627058893800";
 
@@ -46,7 +45,6 @@ function encryptWithServerPubKey(data: string) {
 
 function encryptWithAesKey(data: string) {
     const key = secureLocalStorage.getItem("aesKey");   
-    console.log(key) 
     const aeskey = CryptoJS.enc.Utf8.parse(key)
     const iv = CryptoJS.enc.Utf8.parse(iv_)
     const cipherText = CryptoJS.AES.encrypt(

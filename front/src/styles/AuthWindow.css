@@ -14,6 +14,7 @@
     left: 0;
 
     z-index: 10;
+    
 }
 
 .auth-window-inner {
@@ -34,4 +35,47 @@
 
 .transfer-form-input {
     width: 50%;
+}
+
+.auth-form{
+    justify-content: center;
+    display: grid;
+    grid-template-columns: 1fr;
+
+    grid-gap: 20px;
+
+    border-radius: 0.5rem;
+    background-color: #2f2f2f;
+}
+
+.auth-input{
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.login-option {
+    transition: all 0.2s ease-in-out;
+}
+
+.login-option:hover {
+    cursor: pointer;
+    color: #c1c1c1;
+}
+
+.warn-message {
+    margin-left: auto;
+    margin-right: auto;
+    width: min-content;
+    color: rgb(162, 63, 63);
+    font-size: 30px;
+    font-weight: 200;
+
+    text-shadow: 2px 2px 4px rgb(255, 73, 73);
+    transition: all 0.2s ease-in-out;
+}
+
+.warn-message:hover {
+    cursor: default;
+    color: rgb(255, 73, 73);
 }
