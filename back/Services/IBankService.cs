@@ -5,8 +5,8 @@ namespace projekt.Serivces;
 
 public interface IBankService
 {
-    LoginResponse Login(LoginRequest request);
-    RegisterResponse Register(RegisterRequest request);
+    AccountResponse Login(LoginRequest request);
+    AccountResponse Register(RegisterRequest request);
     AccountResponse GetAccount(AccountRequest accountNumber);
     AccountResponse NewTransfer(TransferRequest request);
     PassChangeResponse ChangePassword(PassChangeRequest request);

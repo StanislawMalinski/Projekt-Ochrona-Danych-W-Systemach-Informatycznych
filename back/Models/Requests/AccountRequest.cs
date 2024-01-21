@@ -2,7 +2,7 @@
 
 namespace projekt.Models.Requests
 {
-    public record AccountRequest
+    public class AccountRequest
     {
         public AccountRequest()
         {

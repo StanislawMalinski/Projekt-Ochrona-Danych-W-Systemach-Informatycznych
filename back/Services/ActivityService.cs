@@ -13,15 +13,16 @@ public class ActivityService : IActivityService
         _activityRepository = activityRepository;
     }
 
-    public void LogActivity(ActivityType type, HttpContext context, bool success)
+    public void LogActivity(ActivityType type,  bool success)
     {
-           var activity = new Activity
-            {
-                Id = 0,
-                Date = DateTime.Now,
-                Type = type,
-                Success = success
-            };
-            _activityRepository.LogActivity(activity);
+        var activity = new Activity
+        {
+            Id = 0,
+            Date = DateTime.Now,
+            IP = "",
+            Type = type,
+            Success = success
+        };
+        _activityRepository.LogActivity(activity);
     }
 }

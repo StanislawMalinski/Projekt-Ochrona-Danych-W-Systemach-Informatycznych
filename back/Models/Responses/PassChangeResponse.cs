@@ -2,12 +2,14 @@
 
 namespace projekt.Models.Responses
 {
-    public record PassChangeResponse
+    public class PassChangeResponse
     {
         public PassChangeResponse()
         {
-            AccountNumber = "";
+            Message = "";
+            Success = false;
         }
-        public required string AccountNumber { get; set; }
+        public string Message { get; set; }
+        public bool Success { get; set; }
     }
 }

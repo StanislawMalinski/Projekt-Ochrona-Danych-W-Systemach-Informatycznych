@@ -19,6 +19,7 @@ builder.Services.AddScoped<IActivityService, ActivityService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ITransferRepository, TransferRepository>();
 builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
+builder.Services.AddScoped<IVerificationRepository, VerificationRepository>();
 
 var myPolicy = "MyCorsePolicy";
 builder.Services.AddCors(options =>

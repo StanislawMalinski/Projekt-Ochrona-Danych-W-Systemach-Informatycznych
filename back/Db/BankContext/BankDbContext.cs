@@ -9,5 +9,6 @@ namespace projekt.Db.BankContext
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Transfer> Transfers { get; set; }
         public DbSet<Activity> Activities { get; set; }
+        public DbSet<Verification> Verifications { get; set; }
     }
 }

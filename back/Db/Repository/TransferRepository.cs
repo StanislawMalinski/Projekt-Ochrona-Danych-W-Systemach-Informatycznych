@@ -11,8 +11,9 @@ public class TransferRepository : ITransferRepository{
         _bankDbContext = bankDbContext;
     }
 
-    public Transfer NewTransfer(Transfer transfer){
-        throw new NotImplementedException();
+    public void NewTransfer(Transfer transfer){
+        _bankDbContext.Transfers.Add(transfer);
+        _bankDbContext.SaveChanges();
     }
 
 
@@ -20,6 +21,7 @@ public class TransferRepository : ITransferRepository{
         var toMe = _bankDbContext.Transfers.Where(t => t.AccountNumber == accountNumber).ToList();
         var fromMe = _bankDbContext.Transfers.Where(t => t.RecipentAccountNumber== accountNumber).ToList();
         var history = toMe.Concat(fromMe).ToList();
+        history.Sort((x,y) => DateTime.Compare(x.Date, y.Date));
         return history;
     }
 }

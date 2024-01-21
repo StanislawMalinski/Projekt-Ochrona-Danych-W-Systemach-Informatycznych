@@ -1,6 +1,6 @@
 namespace projekt.Models.Requests
 {
-    public record LoginRequest
+    public class LoginRequest
     {
         public LoginRequest()
         {

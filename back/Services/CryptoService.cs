@@ -1,13 +1,13 @@
 
+using System.Security.Cryptography;
+using System.Text;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+
 namespace projekt.Serivces
 {
-    public class CryptoService : ICryptoService
+    public class CryptoService
     {
-
-        public string encryptAes(string plainText, string aes ){
-            
-        }
-        public string HashPassword(string password, string salt)
+        public static string HashPassword(string password, string salt)
         {
             var bytes = KeyDerivation.Pbkdf2(
                 password: password,
@@ -19,7 +19,7 @@ namespace projekt.Serivces
             return Convert.ToBase64String(bytes);
         }
 
-        public string GenerateSalt()
+        public static string GenerateSalt()
         {
             var salt = new byte[128 / 8];
             using(var rng = RandomNumberGenerator.Create())

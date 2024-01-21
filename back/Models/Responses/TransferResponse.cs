@@ -2,7 +2,7 @@ using projekt.Models.Dtos;
 
 namespace projekt.Models.Responses
 {
-    public record TransferResponse
+    public class TransferResponse
     {
         public TransferResponse()
         {

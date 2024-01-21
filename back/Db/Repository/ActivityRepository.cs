@@ -16,8 +16,8 @@ namespace projekt.Db.Repository
 
         public Activity LogActivity(Activity activity)
         {
-             _bankDbContext.Activities.AddAsync(activity);
-             _bankDbContext.SaveChangesAsync();
+             _bankDbContext.Activities.Add(activity);
+             _bankDbContext.SaveChanges();
             return activity;
         }
 

@@ -1,16 +1,22 @@
+using Microsoft.AspNetCore.Components.Web;
+
 namespace projekt.Models.Requests
 {
 
-    public record TransferRequest
+    public class TransferRequest
     {
         public TransferRequest()
         {
             AccountNumber = "";
             RecipientAccountNumber = "";
-            Amount = 0;
+            Recipient = "";
+            Value = 0;
+            Title = "";
         }
         public required string AccountNumber { get; set; }
         public required string RecipientAccountNumber { get; set; }
-        public required decimal Amount { get; set; }
+        public required string Recipient { get; set; }
+        public required decimal Value { get; set; }
+        public required string Title { get; set; }
     }
 }

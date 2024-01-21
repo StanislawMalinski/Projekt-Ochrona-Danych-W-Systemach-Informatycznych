@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace projekt.Models.Requests
 {
-    public record PassChangeRequest
+    public class PassChangeRequest
     {
         public PassChangeRequest()
         {
