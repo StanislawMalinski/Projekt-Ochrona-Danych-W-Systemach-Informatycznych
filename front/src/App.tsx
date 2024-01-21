@@ -18,8 +18,6 @@ function App() {
     .then((response) => {
       if (response) {
         setAccountf(response);
-      } else {
-        console.log("Error in account")
       }
     })
   }

@@ -79,3 +79,8 @@
     cursor: default;
     color: rgb(255, 73, 73);
 }
+
+.disable{
+    display: none;
+    cursor: default;
+}

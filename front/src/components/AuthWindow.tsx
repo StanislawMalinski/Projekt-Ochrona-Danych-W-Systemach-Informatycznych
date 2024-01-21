@@ -24,6 +24,10 @@ function AuthWindow(props: AuthWindowProps) {
     const [message, setMessage] = useState("");
     const [disabled, setDisabled] = useState(false);
 
+    useEffect(() => {
+        setMessage("");
+    }, [mode, logged]);
+
     const auth = (m: string ) => {
         console.log(m)
         switch (m) {
@@ -63,14 +67,13 @@ function AuthWindow(props: AuthWindowProps) {
     var log = (<>
         <LoginComp setLoginRequest={setLoginRequest}/>
         <p className='login-option' onClick={() => setMode("password")}>Forgot password?</p>
-        <p className='login-option' onClick={() => setMode("register")}>Sign in</p>
+        <p className={'login-option ' } onClick={() => setMode("register")} >Sign in</p>
         </>);
     var pass = (<>dupa
         <p className='login-option' onClick={() => setMode("login")}>Cancle</p>
         </>);
 
     var switchMode = () => {
-        setMessage("");
         let cc;
         switch (mode) {
             case "register":
@@ -99,7 +102,7 @@ function AuthWindow(props: AuthWindowProps) {
             <div className='auth-window-inner'>
                 {content}
                 <p className="warn-message">{message}</p>
-                <button onClick={() => auth(mode)} >{mode}</button>
+                <button className={disabled ? "disable" : ""}  onClick={() => auth(mode)} >{mode}</button>
             </div>
         </div>
         }

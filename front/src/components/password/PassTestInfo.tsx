@@ -11,8 +11,6 @@ interface PassTestInfoProps {
 
 function PassTestInfo(props: PassTestInfoProps){
     const {pass, reapeatPass, setDisabled} = props;
-    const [equal, setEqual] = useState(false);
-    const [strenght, setStrenht] = useState(0);
     const [check, setCheck] = useState({'containsUpperLetters': false,
     'containsLowerLetters': false,
     'containsSpecialChars': false,
@@ -20,27 +18,23 @@ function PassTestInfo(props: PassTestInfoProps){
     'isAtLeastEightLetter': false,
     'isGoodPass'           : false});
 
+    const checkDisable = () => {
+        var d = (!(
+            check.containsLowerLetters && 
+            check.containsUpperLetters &&
+            check.containsSpecialChars &&
+            check.containsNumbers      &&
+            check.isAtLeastEightLetter &&
+            check.isGoodPass           &&
+            pass === reapeatPass));
+        return (d);
+        }
 
     useEffect(() => {
-        setStrenht(passStrenght(pass));
         setCheck(passCheck(pass));
-        setEqual(pass === reapeatPass && pass !== "");
-    }, [pass]);
-    
-    useEffect(() => {
-        setEqual(pass === reapeatPass && pass !== "");
-    }, [reapeatPass]);
-
-    useEffect(() => {
-        setDisabled(
-        check.containsLowerLetters || 
-        check.containsUpperLetters ||
-        check.containsSpecialChars ||
-        check.containsNumbers      ||
-        check.isAtLeastEightLetter ||
-        check.isGoodPass           ||
-        equal);
+        setDisabled(checkDisable());  
     }, [pass, reapeatPass]);
+
     return (<>
             <table>
                 <tbody>
@@ -89,7 +83,7 @@ function PassTestInfo(props: PassTestInfoProps){
                             Passwords are the same.
                         </td>
                         <td>
-                        {equal ? <p className='good'>✅</p>: <p className="bad">❌</p> }
+                        {(pass === reapeatPass) ? <p className='good'>✅</p>: <p className="bad">❌</p> }
                         </td>
                     </tr>
                 </tbody>
