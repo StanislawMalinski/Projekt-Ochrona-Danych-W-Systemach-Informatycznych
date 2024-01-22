@@ -3,7 +3,7 @@ import {useEffect, useState} from 'react'
 import Account from './components/Account'
 import TransferWindow from './components/TransferWindow'
 import AuthWindow from './components/AuthWindow';
-import { account } from './Client';
+import { account, getPubKey } from './Client';
 import { deleteCredentials } from './utils/Cipher';
 
 const emptyAccount = { "accountNumber": "", "balance": 0, "history": [{ "accountNumber": "", "recipientAccountNumber": "", "recipient": "", "title": "", "value": 0 }] }
@@ -13,6 +13,8 @@ function App() {
   const [log, setLog] = useState(false);
   const [accountf, setAccountf] = useState(emptyAccount)
   
+  getPubKey()
+
   const relod = () => {
     account({accountNumber: accountf.accountNumber})
     .then((response) => {

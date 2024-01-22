@@ -32,7 +32,8 @@
         "register": "/register",
         "passwordchange": "/pass-change",
         "transfer": "/transfer",
-        "account": "/account"
+        "account": "/account",
+        "pubkey": "/pubkey"
     },
     "key":{
         "iterations": 1000,

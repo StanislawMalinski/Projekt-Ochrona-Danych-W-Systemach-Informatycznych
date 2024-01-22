@@ -1,5 +1,6 @@
 import config from '../clientconfig.json';
 import {sha256} from 'crypto-hash';
+import { saveServerPubKey } from './utils/Cipher';
 
 var baseUrl = '';
 var accessControlAllowOrigin = '';
@@ -109,4 +110,24 @@ function account(body: any) {
     });
 }
 
-export {login, register, passwordchange, transfer, account}
+function getPubKey() {
+    return fetch(baseUrl + config.urls.pubkey, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': accessControlAllowOrigin
+        }
+    }).then((response) => {
+        if (response.status === 200) {
+            console.log(response);
+            response.json().then((data) => {
+                console.log(data);
+                saveServerPubKey(data);
+            });
+        }
+    }).catch((error) => {
+        console.log(error);
+    });
+}
+
+export {login, register, passwordchange, transfer, account, getPubKey}

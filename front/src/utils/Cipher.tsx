@@ -36,33 +36,18 @@ function saveServerPubKey(key: string) {
 function encryptWithServerPubKey(data: string) {
     var key = secureLocalStorage.getItem("serverKey");
     if (key) {
-
         return null;
     } else {
         return null;
     }
 }
 
-function encryptWithAesKey(data: string) {
-    const key = secureLocalStorage.getItem("aesKey");   
-    const aeskey = CryptoJS.enc.Utf8.parse(key)
-    const iv = CryptoJS.enc.Utf8.parse(iv_)
-    const cipherText = CryptoJS.AES.encrypt(
-        CryptoJS.enc.Utf8.parse( data) ,
-            aeskey,
-            {iv, keySize: 128 / 8, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7,}).toString();
-    return cipherText;
-}
 
-function decryptWithAesKey(data: string) {
-    const key = secureLocalStorage.getItem("aesKey");
-    const aeskey = CryptoJS.enc.Utf8.parse(key)
-    const iv = CryptoJS.enc.Utf8.parse(iv_)
-    const cipherText = CryptoJS.AES.decrypt(
-        CryptoJS.enc.Utf8.parse(data),
-            aeskey,
-            {iv, keySize: 128 / 8, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7,}).toString();
-    return cipherText;
-}
-
-export { hash, saveCredentials, getCredentials, deleteCredentials, saveServerPubKey, encryptWithServerPubKey, encryptWithAesKey, decryptWithAesKey };
+export { 
+    hash, 
+    saveCredentials,
+    getCredentials, 
+    deleteCredentials, 
+    saveServerPubKey, 
+    encryptWithServerPubKey
+    };

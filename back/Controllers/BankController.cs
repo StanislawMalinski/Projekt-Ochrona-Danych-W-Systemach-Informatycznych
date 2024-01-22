@@ -85,7 +85,7 @@ public class BankController : ControllerBase
         }
     }
 
-    [HttpGet("pubKey")]
+    [HttpGet("pubkey")]
     public IActionResult GetPublicKey()
     {
         _activityService.LogActivity(ActivityType.Login, true);
