@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PassTestInfo from "./PassTestInfo";
 import PasswordInput from "./PasswordInput";
 

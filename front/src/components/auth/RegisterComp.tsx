@@ -8,7 +8,7 @@ interface RegisterCompProps {
 }
 
 function RegisterComp(props: RegisterCompProps) {
-    const {setRegisterRequest, setMessage, setDisabled} = props;
+    const {setRegisterRequest, setDisabled} = props;
 
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");

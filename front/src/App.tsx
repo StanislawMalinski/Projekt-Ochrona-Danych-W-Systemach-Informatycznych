@@ -1,5 +1,5 @@
 import './App.css'
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
 import Account from './components/Account'
 import TransferWindow from './components/TransferWindow'
 import AuthWindow from './components/AuthWindow';

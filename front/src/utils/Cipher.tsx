@@ -1,9 +1,8 @@
-import { sha256, sha384} from "crypto-hash";
+import { sha256 } from "crypto-hash";
 import  secureLocalStorage  from  "react-secure-storage";
 import config from "../../clientconfig.json"
-import { useState } from "react";
 
-const iv_ = "0535627058893800";
+// const iv_ = "0535627058893800";
 
 async function hash(password: string) {
     for (let i = 0; i < config.key.iterations; i++) {
@@ -36,9 +35,7 @@ function saveServerPubKey(key: string) {
 function encryptWithServerPubKey(data: string) {
     var key = secureLocalStorage.getItem("serverKey");
     if (key) {
-        return null;
-    } else {
-        return null;
+        return data;
     }
 }
 

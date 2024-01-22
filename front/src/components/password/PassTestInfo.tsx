@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { passCheck, passStrenght } from "../../service/PassCheck";
+import { passCheck } from "../../service/PassCheck";
 import './styles/PasswordInput.css'
 
 

@@ -30,7 +30,6 @@ function passStrenght(arg: string){
     var Numbers = 0;
     var SpecialChars = 0;
     var charSet = new Set<string>();
-    var len = arg.length;
 
     for (let i = 0; i < arg.length; i++) {
         if(arg[i] == arg[i].toLocaleLowerCase()) UpperLetters++;

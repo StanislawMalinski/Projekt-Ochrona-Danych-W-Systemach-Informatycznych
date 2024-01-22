@@ -1,6 +1,6 @@
 import { transfer } from '../Client';
 import '../styles/TransferWindow.css'
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 interface TransferWindowProps {
     state: boolean;

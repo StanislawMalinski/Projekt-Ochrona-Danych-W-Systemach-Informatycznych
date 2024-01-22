@@ -230,3 +230,18 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+
+# Data base files
+
+*.db
+*.db-shm
+*.db-wal
+
+# Migrations
+
+**/Migrations/*.cs
+
+# Dotnet
+
+**/bin/
+**/obj/

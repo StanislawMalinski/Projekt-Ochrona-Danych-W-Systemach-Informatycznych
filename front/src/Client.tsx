@@ -1,27 +1,15 @@
 import config from '../clientconfig.json';
-import {sha256} from 'crypto-hash';
 import { saveServerPubKey } from './utils/Cipher';
 
 var baseUrl = '';
 var accessControlAllowOrigin = '';
-if (process.env.NODE_ENV === 'development') {
-    baseUrl = config.development.server.protocol + '://' 
-        + config.development.server.host + ':' 
-        + config.development.server.port
-        + config.baseUrl;
-    accessControlAllowOrigin += config.development.host.protocol + '://'
-        + config.development.host.host + ':'
-        + config.development.host.port;
-    
-} else if (process.env.NODE_ENV === 'production') {
-    baseUrl = config.production.server.protocol + '://' 
-        + config.production.server.host + ':' 
-        + config.production.server.port
-        + config.baseUrl;
-    accessControlAllowOrigin = config.production.host.protocol + '://'
-        + config.production.host.host + ':'
-        + config.production.host.port;
-}
+baseUrl = config.production.server.protocol + '://' 
+    + config.production.server.host + ':' 
+    + config.production.server.port
+    + config.baseUrl;
+accessControlAllowOrigin = config.production.host.protocol + '://'
+    + config.production.host.host + ':'
+    + config.production.host.port;
 
 function login(body: any) {
     return fetch(baseUrl + config.urls.login, {
