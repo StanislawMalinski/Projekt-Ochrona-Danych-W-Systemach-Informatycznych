@@ -64,7 +64,9 @@ public class BankService : IBankService
         return new AccountResponse{
             AccountNumber = result.AccountNumber,
             Balance = result.Balance,
-            History = _transferRepository.GetHistory(request.AccountNumber)
+            History = _transferRepository.GetHistory(request.AccountNumber),
+            Message = "Account found.",
+            Success = true
         };
     }
     public AccountResponse Login(LoginRequest request)
@@ -121,7 +123,6 @@ public class BankService : IBankService
 
     private void SendPasswordMessageChange(string email, string verificationCode){
         var message = "Dear customer. There is pending password change on your account.";
-
         Console.WriteLine("Send To" + email + "\n" 
                         + message + "\n"
                         + "Verification code: " + verificationCode);

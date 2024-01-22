@@ -18,6 +18,7 @@ namespace projekt.Models.Responses
             Balance = 0;
             History = new List<Transfer>();
             Message = message;
+            Success = false;
         }
         public required string AccountNumber { get; set; }
         public required decimal Balance { get; set; }
