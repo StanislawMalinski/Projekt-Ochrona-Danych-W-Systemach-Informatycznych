@@ -21,16 +21,16 @@ public class BankService : IBankService
         _debug_service = debug_service;
     }
 
-    public AccountResponse  Register(RegisterRequest request)
+    public SimpleResponse Register(RegisterRequest request)
     {
         var accountExists = _accountRepository.CheckIfAccountExistsByEmail(request.Email);
-        if(accountExists) { return new AccountResponse { AccountNumber = "", Balance = 0, History = new List<Transfer>(), Message = "Account with this email already exists.", Success = false };}
+        if(accountExists) { return new SimpleResponse { Message = "Account with this email already exists.", Success = false };}
         var result = _accountRepository.Register(request);
-        return new AccountResponse{
-            AccountNumber = result.AccountNumber,
-            Balance = result.Balance,
-            History = [],
-            Message = "Registration successful.",
+        var verification_code = GenerateVerificationCode();
+        _verificationRepository.CreateVerification(request.Email, verification_code);
+        SendVerificationMessage(request.Email, verification_code);
+        return new SimpleResponse{
+            Message = "Awaits for verification.",
             Success = true
         };
     }
@@ -139,6 +139,12 @@ public class BankService : IBankService
             Message = "Transfer was successful.",
             Success = true
         };
+    }
+
+    private void SendVerificationMessage(string email, string verification_code)
+    {
+        var message = $"Dear customer. Here is your verification code: {verification_code}";
+        _debug_service.LogMessage(email, message);
     }
 
     private void SendPasswordMessageChange(string email, string verificationCode){
