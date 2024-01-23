@@ -6,8 +6,8 @@ namespace projekt.Models.Requests
     {
         public AccountRequest()
         {
-            AccountNumber = "";
+            Email = "";
         }
-        public required string AccountNumber { get; set; }
+        public required string Email{ get; set; }
     }
 }

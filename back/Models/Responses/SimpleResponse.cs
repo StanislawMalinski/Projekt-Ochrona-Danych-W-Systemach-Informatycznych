@@ -2,14 +2,14 @@
 
 namespace projekt.Models.Responses
 {
-    public class PassChangeResponse
+    public class SimpleResponse
     {
-        public PassChangeResponse()
+        public SimpleResponse()
         {
-            Message = "";
             Success = false;
+            Message = "";
         }
-        public string Message { get; set; }
         public bool Success { get; set; }
+        public string Message { get; set; }
     }
 }

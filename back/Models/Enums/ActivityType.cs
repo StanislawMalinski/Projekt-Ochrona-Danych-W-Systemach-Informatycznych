@@ -7,5 +7,8 @@ public enum ActivityType
     Register,
     GetAccount,
     NewTransfer,
-    ChangePassword   
+    ChangePassword,
+    GetActivities,
+    ChangePasswordCodeRequest,
+    CodeSubmit
 }

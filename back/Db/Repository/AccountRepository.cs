@@ -26,11 +26,6 @@ public class AccountRepository : IAccountRepository
         return result;
     }
 
-    public Account ChangePassword(PassChangeRequest request){
-        var account = _bankDbContext.Accounts.FirstOrDefault(x => x.Email == request.Email);
-        return account;
-    }
-
     public Account Register(RegisterRequest request){
         var salt = CryptoService.GenerateSalt();
         _bankDbContext.Accounts.Add(new Account{
@@ -39,16 +34,39 @@ public class AccountRepository : IAccountRepository
             Email = request.Email,
             Balance = 100.00M,
             Password = CryptoService.HashPassword( request.Password,salt),
-            Salt = salt
+            Salt = salt,
+            IsVerified = false
         });
         _bankDbContext.SaveChanges();
         var account = _bankDbContext.Accounts.FirstOrDefault(x => x.Email == request.Email);
         return account;
     }
 
+    public Account Register(Account account){
+        account.AccountNumber = GenerateAccountNumber();
+        account.Salt = CryptoService.GenerateSalt();
+        account.Password = CryptoService.HashPassword(account.Password, account.Salt);
+        account.IsVerified = false;
+        _bankDbContext.Accounts.Add(account);
+        _bankDbContext.SaveChanges();
+        return account;
+    }
+
+    public bool VerifyAccount(string email){
+        try{
+            var account = _bankDbContext.Accounts.FirstOrDefault(x => x.Email == email && !x.IsVerified);
+            if (account == null) return false;
+            account.IsVerified = true;
+            _bankDbContext.SaveChanges();
+            return true;
+        } catch(Exception e){
+            return false;
+        }
+    }
+
     public bool validUser(LoginRequest request){
         try{
-            var account = _bankDbContext.Accounts.FirstOrDefault(x => x.Email == request.Email);
+            var account = _bankDbContext.Accounts.FirstOrDefault(x => x.Email == request.Email && x.IsVerified);
             if (account == null) return false;
             var salt = account.Salt;
             var password = CryptoService.HashPassword(request.Password, salt);
@@ -61,16 +79,20 @@ public class AccountRepository : IAccountRepository
 
     public bool CheckIfAccountExistsByEmail(string Email){
         try{
-            var result = _bankDbContext.Accounts.FirstOrDefault(x => x.Email == Email);
+            var result = _bankDbContext.Accounts.FirstOrDefault(x => x.Email == Email && x.IsVerified);
             return result != null;
         } catch(Exception e){
-            Console.WriteLine(e);
             return false;
         }
     }
 
     public bool CheckIfAccountExistsByAccountNumber(string AccountNumber){
-        var result = _bankDbContext.Accounts.FirstOrDefault(x => x.AccountNumber == AccountNumber);
+        var result = _bankDbContext.Accounts.FirstOrDefault(x => x.AccountNumber == AccountNumber && x.IsVerified);
+        return result != null;
+    }
+
+    public bool CheckIfNotVerifiedAccountExistsByEmail(string Email){
+        var result = _bankDbContext.Accounts.FirstOrDefault(x => x.Email == Email && !x.IsVerified);
         return result != null;
     }
 
@@ -86,11 +108,29 @@ public class AccountRepository : IAccountRepository
         return account.Balance >= value;
     }
 
-    public void makeTransfer(Transfer transfer){
-        var account = _bankDbContext.Accounts.FirstOrDefault(x => x.AccountNumber == transfer.AccountNumber);
-        account.Balance -= transfer.Value;
-        var recipient = _bankDbContext.Accounts.FirstOrDefault(x => x.AccountNumber == transfer.RecipentAccountNumber);
-        recipient.Balance += transfer.Value;
-        _bankDbContext.SaveChanges();
+    public bool makeTransfer(Transfer transfer){
+        try {
+            var account = _bankDbContext.Accounts.FirstOrDefault(x => x.AccountNumber == transfer.AccountNumber);
+            account.Balance -= transfer.Value;
+            var recipient = _bankDbContext.Accounts.FirstOrDefault(x => x.AccountNumber == transfer.RecipentAccountNumber);
+            recipient.Balance += transfer.Value;
+            _bankDbContext.SaveChanges();
+            return true;
+        } catch(Exception e){
+            return false;
+        }
+    }
+
+    public bool ChangePassword(string email, string password)
+    {
+        try{
+            var account = _bankDbContext.Accounts.FirstOrDefault(x => x.Email == email && x.IsVerified);
+            if (account == null) return false;
+            account.Password = CryptoService.HashPassword(password, account.Salt);
+            _bankDbContext.SaveChanges();
+            return true;
+        } catch(Exception e){
+            return false;
+        }
     }
 }

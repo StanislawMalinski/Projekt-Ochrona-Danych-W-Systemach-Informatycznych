@@ -2,9 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace projekt.Models.Requests
 {
-    public class PassChangeRequest
+    public class PassChangeRequestCode
     {
-        public PassChangeRequest()
+        public PassChangeRequestCode()
         {
             Email = "";
         } 

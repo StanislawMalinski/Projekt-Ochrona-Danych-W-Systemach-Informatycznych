@@ -57,11 +57,13 @@ namespace projekt.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("AssociatedEmail")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("IP")
-                        .IsRequired()
+                    b.Property<string>("Origin")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("Success")

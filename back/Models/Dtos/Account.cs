@@ -9,4 +9,5 @@ public class Account{
     public decimal Balance {get; set;}
     public string Password {get; set;}
     public string Salt {get; set;}
+    public bool IsVerified {get; set;}
 }

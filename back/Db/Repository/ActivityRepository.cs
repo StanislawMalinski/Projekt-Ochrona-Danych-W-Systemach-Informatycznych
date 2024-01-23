@@ -21,14 +21,9 @@ namespace projekt.Db.Repository
             return activity;
         }
 
-        public Activity GetActivity(int id)
+        public  List<Activity> GetActivities(string email)
         {
-            throw new NotImplementedException();
-        }
-
-        public  List<Activity> GetActivities()
-        {
-            throw new NotImplementedException();
+            return _bankDbContext.Activities.Where(a => a.AssociatedEmail == email).ToList();
         }
     }
 }
