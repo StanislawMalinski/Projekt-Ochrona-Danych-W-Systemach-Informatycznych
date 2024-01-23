@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Components.Web;
+using projekt.Serivces;
 
 namespace projekt.Models.Requests
 {
@@ -18,5 +18,13 @@ namespace projekt.Models.Requests
         public required string Recipient { get; set; }
         public required decimal Value { get; set; }
         public required string Title { get; set; }
+
+        public bool IsValid()
+        {
+            return  Validator.validNumber(AccountNumber) && 
+                    Validator.validNumber(RecipientAccountNumber) && 
+                    Validator.validName(Recipient) && 
+                    Validator.validText(Title) && Value > 0;
+        }
     }
 }

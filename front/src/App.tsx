@@ -4,8 +4,7 @@ import Account from './components/Account'
 import TransferWindow from './components/TransferWindow'
 import AuthWindow from './components/AuthWindow';
 import { account, getPubKey } from './Client';
-import { deleteCredentials } from './utils/Cipher';
-import Warnings from './components/Warnings';
+import { deleteCredentials, getCredentials } from './utils/Cipher';
 
 const emptyAccount = { "accountNumber": "", "balance": 0, "history": [{ "accountNumber": "", "recipientAccountNumber": "", "recipient": "", "title": "", "value": 0 }] }
 
@@ -19,7 +18,7 @@ function App() {
   }, [])
 
   const relod = () => {
-    account({accountNumber: accountf.accountNumber})
+    account({email: getCredentials().email})
     .then((response) => {
       if (response) {
         setAccountf(response);
@@ -32,9 +31,10 @@ function App() {
       <AuthWindow logged={log} setLogged={(e: boolean) => setLog(e)} setAccount={(e) => setAccountf(e)}/>
       <TransferWindow state={twv} close={() => setTWV(false)} accountNumber={accountf.accountNumber} relod={relod}/>
       <Account newTransfer={() => setTWV(true)} credentials={accountf} logOut={() => {setLog(false); deleteCredentials();}}/>
-      <Warnings logged={log}/>
+      
     </>
   )
 }
 
 export default App
+//<Warnings logged={log}/>

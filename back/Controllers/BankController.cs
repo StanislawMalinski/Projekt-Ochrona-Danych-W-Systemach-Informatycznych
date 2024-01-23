@@ -26,7 +26,7 @@ public class BankController : ControllerBase
     {
         Thread.Sleep(1000);
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (request.Email == "" || request.Password == "")
+        if (!request.IsValid())
             return BadRequest("Email or password cannot be empty");
         try {
             var response = _bankService.Login(request);
@@ -43,7 +43,7 @@ public class BankController : ControllerBase
     {
         Thread.Sleep(1000);
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (request.Email == "" || request.Password == "")
+        if (!request.IsValid())
             return BadRequest("Email or password cannot be empty");
         try { 
             var response = _bankService.Register(request);
@@ -60,7 +60,7 @@ public class BankController : ControllerBase
     {
         Thread.Sleep(1000);
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (request.Email == "" || request.Code == "")
+        if (!request.IsValid())
             return BadRequest("Email or password cannot be empty");
         try {
             var response = _bankService.CodeSubmitRegister(request);
@@ -77,7 +77,7 @@ public class BankController : ControllerBase
     {
         Thread.Sleep(1000);
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (request.Email == "")
+        if (!request.IsValid())
             return BadRequest("Email cannot be empty");
         try {
             var response = _bankService.ChangePasswordCodeRequest(request);
@@ -94,7 +94,7 @@ public class BankController : ControllerBase
     {
         Thread.Sleep(1000);
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (request.Email == "" || request.Code == "")
+        if (!request.IsValid())
             return BadRequest("Email or password cannot be empty");
         try {
             var response = _bankService.CodeSubmit(request);
@@ -111,7 +111,7 @@ public class BankController : ControllerBase
     {
         Thread.Sleep(1000);
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (request.Email == "" || request.Password == "")
+        if (!request.IsValid())
             return BadRequest("Email or password cannot be empty");
         try {
             var response = _bankService.ChangePassword(request);
@@ -128,8 +128,8 @@ public class BankController : ControllerBase
     {
         Thread.Sleep(1000);
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (request.AccountNumber == "" || request.RecipientAccountNumber == "" || request.Value == 0)
-            return BadRequest("Account number or recipient account number or amount cannot be empty");
+        if (!request.IsValid())
+            return BadRequest("You made some errors");
         try{
             var response = _bankService.NewTransfer(request);
             _activityService.LogActivity(ActivityType.NewTransfer, request.RecipientAccountNumber, origin, response.Success);
@@ -147,7 +147,7 @@ public class BankController : ControllerBase
     {
         Thread.Sleep(1000);
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (request.Email == "")
+        if (!request.IsValid())
             return BadRequest("Email cannot be empty");
         try{
             var response = _bankService.GetAccount(request);
@@ -171,8 +171,8 @@ public class BankController : ControllerBase
     {
         Thread.Sleep(1000);
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (email == "")
-            return BadRequest("Email cannot be empty");
+        if (Validator.validEmail(email) == false)
+            return BadRequest("Invalid email");
         try {
             var response = _activityService.GetActivities(email);
             _activityService.LogActivity(ActivityType.GetActivities, email, origin, true);

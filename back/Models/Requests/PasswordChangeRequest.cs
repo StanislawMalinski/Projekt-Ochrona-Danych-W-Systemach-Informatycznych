@@ -1,4 +1,4 @@
-
+using projekt.Serivces;
 
 namespace projekt.Models.Requests
 {
@@ -7,5 +7,9 @@ namespace projekt.Models.Requests
         public string Email { get; set; }
         public string Code { get; set; }
         public string Password { get; set; }
+        public bool IsValid()
+        {
+            return Validator.validEmail(Email) && Validator.validCode(Code);
+        }
     }
 }

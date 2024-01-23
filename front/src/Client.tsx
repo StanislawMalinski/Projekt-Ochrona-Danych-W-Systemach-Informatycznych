@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import config from '../clientconfig.json';
 import { saveServerPubKey } from './utils/Cipher';
 
@@ -25,8 +24,6 @@ function login(body: any) {
         if (response.status === 200) {
             return response.json();
         }
-    }).catch((error) => {
-        console.log(error);
     });
 }
 
@@ -43,8 +40,6 @@ function register(body: any) {
         if (response.status === 200) {
             return response.json();
         }
-    }).catch((error) => {
-        console.log(error);
     });
 }
 
@@ -61,8 +56,6 @@ function submitregistrationcode(body: any) {
         if (response.status === 200) {
             return response.json();
         }
-    }).catch((error) => {
-        console.log(error);
     });
 }
 
@@ -78,8 +71,6 @@ function passwordchangerequestcode(body: any) {
         if (response.status === 200) {
             return response.json();
         }
-    }).catch((error) => {
-        console.log(error);
     });
 }
 
@@ -95,8 +86,6 @@ function codesubmit(body: any) {
         if (response.status === 200) {
             return response.json();
         }
-    }).catch((error) => {
-        console.log(error);
     });
 }
 
@@ -113,8 +102,6 @@ function passwordchange(body: any) {
         if (response.status === 200) {
             return response.json();
         }
-    }).catch((error) => {
-        console.log(error);
     });
 }
 
@@ -130,8 +117,6 @@ function transfer(body: any) {
         if (response.status === 200) {
             return response.json();
         }
-    }).catch((error) => {
-        console.log(error);
     });
 }
 
@@ -148,8 +133,6 @@ function account(body: any) {
         if (response.status === 200) {
             return response.json();
         }
-    }).catch((error) => {
-        console.log(error);
     });
 }
 
@@ -168,8 +151,6 @@ function getPubKey() {
                 saveServerPubKey(data);
             });
         }
-    }).catch((error) => {
-        console.log(error);
     });
 }
 
@@ -185,8 +166,6 @@ function getactivities(email: string) {
             console.log(response);
             return response.json();
         }
-    }).catch((error) => {
-        console.log(error);
     });
 }
 

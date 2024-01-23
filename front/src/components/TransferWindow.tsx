@@ -17,6 +17,7 @@ function TransferWindow(prop: TransferWindowProps) {
     const [recipient, setRecipent] = useState("");
     const [value, setValue] = useState(0);
     const [title, setTitle] = useState("");
+    const [error, setError] = useState("");
 
     const actionTransfer = () => {
         transfer({accountNumber: accountNumber, recipientAccountNumber: recipientAccountNumber, recipient: recipient, value: value, title: title})
@@ -53,6 +54,7 @@ function TransferWindow(prop: TransferWindowProps) {
                             name="title" type='text' placeholder='title'
                             onChange={(e) => setTitle(e.target.value)}></input> 
                     </form>
+                    <p className="error">{error}</p>
                     <button className='transfer-form-input' name="submit" type='button' onClick={actionTransfer}>Transfer Money</button>
                     <button className='transfer-form-input' name='cancle' type='button' onClick={() => close()}>Cancle</button>
                 </div> 

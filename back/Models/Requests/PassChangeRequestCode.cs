@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using projekt.Serivces;
 
 namespace projekt.Models.Requests
 {
@@ -9,5 +9,9 @@ namespace projekt.Models.Requests
             Email = "";
         } 
         public required string Email { get; set; }
+        public bool IsValid()
+        {
+            return Validator.validEmail(Email);
+        }
     }
 }

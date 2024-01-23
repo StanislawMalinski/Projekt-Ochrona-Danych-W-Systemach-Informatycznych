@@ -21,7 +21,10 @@ public class DebugService : IDebugSerivce
 
     public void LogActivity(Activity activity)
     {
-        if (!activity.Success)Console.WriteLine(activityToLog(activity));
+        if (!activity.Success ||
+            activity.Origin != "") 
+            Console.WriteLine(activityToLog(activity));
+        
     }
 
     public void LogMessage(string recipient, string message)
