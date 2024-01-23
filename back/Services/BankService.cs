@@ -119,6 +119,8 @@ public class BankService : IBankService
             return new AccountResponse { AccountNumber = "", Balance = 0, History = new List<Transfer>(), Message ="Sender account does not exist.", Success = false};
         if (!recipient.IsVerified)
             return new AccountResponse { AccountNumber = "", Balance = 0, History = new List<Transfer>(), Message ="Recipient account does not exist.", Success = false};
+        if (account.AccountNumber == recipient.AccountNumber) 
+            return new AccountResponse { AccountNumber = "", Balance = 0, History = new List<Transfer>(), Message ="You cannot transfer money to yourself.", Success = false};
         var transfer = new Transfer{
             AccountNumber = request.AccountNumber,
             RecipentAccountNumber = recipient.AccountNumber,

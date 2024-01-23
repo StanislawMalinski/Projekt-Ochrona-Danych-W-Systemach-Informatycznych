@@ -2,13 +2,13 @@ namespace projekt.Models.Enums;
 
 public enum ActivityType
 {
-    Login,
-    Logout,
-    Register,
-    GetAccount,
-    NewTransfer,
-    ChangePassword,
-    GetActivities,
-    ChangePasswordCodeRequest,
-    CodeSubmit
+    Login = 0,
+    Logout = 1,
+    Register = 2,
+    GetAccount = 3,
+    NewTransfer = 4,
+    ChangePassword = 5,
+    GetActivities =6 ,
+    ChangePasswordCodeRequest = 7,
+    CodeSubmit = 8
 }

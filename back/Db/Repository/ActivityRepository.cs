@@ -2,6 +2,8 @@
 using projekt.Models.Dtos;
 using projekt.Db.Repository;
 using projekt.Db.BankContext;
+using projekt.Models.Enums;
+using Microsoft.AspNetCore.Mvc;
 
 namespace projekt.Db.Repository
 {
@@ -23,7 +25,9 @@ namespace projekt.Db.Repository
 
         public  List<Activity> GetActivities(string email)
         {
-            return _bankDbContext.Activities.Where(a => a.AssociatedEmail == email).ToList();
+            return _bankDbContext.Activities
+                .Where(a => a.AssociatedEmail == email).ToList();
         }
+
     }
 }

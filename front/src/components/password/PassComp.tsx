@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PassTestInfo from "./PassTestInfo";
 import PasswordInput from "./PasswordInput";
 
@@ -12,18 +12,25 @@ interface PassCompProps {
 
 
 function PassComp(props: PassCompProps){
-    const {pass, setPass, setDisabled} = props;
+    const { setPass, setDisabled} = props;
     const [repeat, setRepeat] = useState("");
+    const [internalPass, setInternalPass] = useState("");
+
+
+    useEffect(() => {
+        setPass(internalPass);
+        console.log("pass: ", internalPass);
+    }, [internalPass]);
 
     return(
         <div>
             <div className="pass-component">
                 <div className="left-pass-component">
-                    <PasswordInput setPass={setPass}/>
+                    <PasswordInput setPass={setInternalPass}/>
                     <PasswordInput setPass={setRepeat}/>
                 </div>
                 <div className="right-pass-component">
-                    <PassTestInfo pass={pass} reapeatPass={repeat} setDisabled={setDisabled} />
+                    <PassTestInfo pass={internalPass} reapeatPass={repeat} setDisabled={setDisabled} />
                 </div>
             </div>
         </div>

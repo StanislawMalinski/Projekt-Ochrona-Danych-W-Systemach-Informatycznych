@@ -1,0 +1,33 @@
+.warning-table {
+    border : 1px solid rgb(226, 102, 0);
+    height: 500px;
+    overflow-y: scroll;
+}
+
+.table-header {
+    position: absolute;
+    background-color: black;
+    width: 100%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    padding: 10px;
+}
+
+.warning-window {
+    position: fixed;
+    width: fit-content;
+    top: 0;
+    left: 0;
+    height: 100%;
+    /* background-color: rgba(0, 0, 0, 0.5); */
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

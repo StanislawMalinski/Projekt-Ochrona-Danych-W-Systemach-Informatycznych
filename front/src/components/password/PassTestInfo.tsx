@@ -31,6 +31,7 @@ function PassTestInfo(props: PassTestInfoProps){
         }
 
     useEffect(() => {
+        console.log(pass);
         setCheck(passCheck(pass));
         setDisabled(checkDisable());  
     }, [pass, reapeatPass]);

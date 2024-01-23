@@ -4,7 +4,7 @@
         "server":{
         "protocol" : "http",
         "host": "localhost",
-        "port": "5106"
+        "port": "3000"
         },
         "host": {
             "protocol" : "http",
@@ -15,9 +15,9 @@
     "production":
     {
         "server":{
-            "protocol" : "https",
-            "host": "0.0.0.0",
-            "port": "5106"
+            "protocol" : "http",
+            "host": "localhost",
+            "port": "3000"
         },
         "host": {
             "protocol" : "http",
@@ -30,10 +30,14 @@
     {
         "login": "/login",
         "register": "/register",
+        "submitregistrationcode": "/code-submit-register",
+        "passwordchangerequestcode": "/pass-change-request-code",
+        "codesubmit": "/code-submit-pass-change",
         "passwordchange": "/pass-change",
         "transfer": "/transfer",
         "account": "/account",
-        "pubkey": "/pubkey"
+        "pubkey": "/pubkey",
+        "activities": "/activities/?email="
     },
     "key":{
         "iterations": 1000,

@@ -3,8 +3,9 @@ import '../styles/AuthWindow.css'
 import LoginComp from './auth/LoginComp';
 import RegisterComp from './auth/RegisterComp';
 
-import {login, register} from '../Client';
+import {login, register, passwordchangerequestcode, codesubmit, submitregistrationcode, passwordchange} from '../Client';
 import { saveCredentials } from '../utils/Cipher';
+import PassChangeComp from './auth/PassChangeComp';
 
 
 interface AuthWindowProps {
@@ -16,10 +17,19 @@ interface AuthWindowProps {
 function AuthWindow(props: AuthWindowProps) {
     const {logged, setLogged, setAccount} = props;
     const [mode, setMode] = useState("login");
+    const [button, setButton] = useState("Login");
     const [content, setContent] = useState(<></>);
 
-    const [registerRequest, setRegisterRequest] = useState({email: "", password: ""})
-    const [loginRequest, setLoginRequest] = useState({email: "", password: ""})
+    // Login
+    const [loginRequest, setLoginRequest]                           = useState({email: "", password: ""})
+    // Password change
+    const [codeChangePasswordRequest, setCodeChangePasswordRequest] = useState({email: ""})
+    const [codeRequest, setCodeRequest]                             = useState({email: "", code: ""})
+    const [passwordChangeRequest, setPasswordChangeRequest]         = useState({email: "", code: "", password: ""})
+    // Register
+    const [registerRequest, setRegisterRequest]                     = useState({email: "", password: ""})
+    const [registerCodeRequest, setRegisterCodeRequest]             = useState({email: "", code: ""})
+   
 
     const [message, setMessage] = useState("");
     const [disabled, setDisabled] = useState(false);
@@ -38,48 +48,97 @@ function AuthWindow(props: AuthWindowProps) {
                         saveCredentials(loginRequest.email, loginRequest.password)
                         setLogged(true);
                         setAccount(response);
-                    } else {
-                        setMessage(response.message);
-                    }
+                    } 
+                    setMessage(response.message);
                 });
                 break;
-            case "register":
+            case "reg-input-cred":
                 register(registerRequest)
                 .then((response) => {
                     if (response.success) {
-                        saveCredentials(registerRequest.email, registerRequest.password)
-                        setLogged(true);
-                        setAccount(response);
-                    } else {
-                        setMessage(response.message);
-                    }
+                        setMode("reg-input-code");
+                    } 
+                    setMessage(response.message);
+                });
+                break;
+            case "reg-input-code":
+                submitregistrationcode(registerCodeRequest)
+                .then((response) => {
+                    if (response.success) {
+                        setMode("login");
+                    } 
+                    setMessage(response.message);
                 });
             break;
-            case "password":
+            case "pass-input-mail":
+                passwordchangerequestcode(codeChangePasswordRequest)
+                .then((response) => {
+                    console.log(response)
+                    if (response.success) {
+                        setMode("pass-input-code");
+                        console.log("zmieniono tryb")
+                    } else {
+                        setMessage(response.message);
+                        console.log("nie zmieniono trybu")
+                    }
+                    setMessage(response.message);
+                });
+                break;
+            case "pass-input-code":
+                codesubmit(codeRequest)
+                .then((response) => {
+                    if (response.success) {
+                        setMode("pass-input-pass");
+                    } 
+                    setMessage(response.message);
+                });
+                break;
+            case "pass-input-pass":
+                passwordchange(passwordChangeRequest) 
+                .then((response) => {
+                    if (response.success) {
+                        setMode("login");
+                    }
+                    setMessage(response.message);
+                });
                 break;
         }
     }
 
     var reg = (<>
-        <RegisterComp setRegisterRequest={setRegisterRequest} setMessage={(e) => setMessage(e)} setDisabled={(e) => setDisabled(e)}/>
+        <RegisterComp 
+            setRegisterRequest={setRegisterRequest}
+            setRegisterCodeRequest={setRegisterCodeRequest}
+            setMessage={(e) => setMessage(e)}
+            setDisabled={(e) => setDisabled(e)}
+            mode={mode} />
         <p className='login-option' onClick={() => setMode("login")}>You have an account?</p>
         </>)
     var log = (<>
         <LoginComp setLoginRequest={setLoginRequest}/>
-        <p className='login-option' onClick={() => setMode("password")}>Forgot password?</p>
-        <p className={'login-option ' } onClick={() => setMode("register")} >Sign in</p>
+        <p className='login-option' onClick={() => setMode("pass-input-mail")}>Forgot password?</p>
+        <p className='login-option ' onClick={() => setMode("reg-input-cred")} >Sign in</p>
         </>);
-    var pass = (<>dupa
+    var pass = (<>
+        <PassChangeComp 
+            setCodeChangePasswordRequest={setCodeChangePasswordRequest}
+            setPasswordChangeRequest={setPasswordChangeRequest}
+            setCodeRequest={setCodeRequest}
+            setDisabled={(e) => setDisabled(e)}
+            mode={mode}/>
         <p className='login-option' onClick={() => setMode("login")}>Cancle</p>
         </>);
 
     var switchMode = () => {
         let cc;
         switch (mode) {
-            case "register":
+            case "reg-input-cred":
+            case "reg-input-code":
                 cc = reg;
                 break;
-            case "password":
+            case "pass-input-mail":
+            case "pass-input-code":
+            case "pass-input-pass":
                 cc = pass;
                 break;
             case "login":
@@ -89,9 +148,35 @@ function AuthWindow(props: AuthWindowProps) {
         }
         return cc;
     }
+    var switchButton = () => {
+        let cc;
+        switch (mode) {
+            case "reg-input-cred":
+                cc = "Sign in";
+                break;
+            case "reg-input-code":
+                cc = "Verify";
+                break;
+            case "pass-input-mail":
+                cc = "Send code";
+                break;
+            case "pass-input-code":
+                cc = "Verify";
+                break;
+            case "pass-input-pass":
+                cc = "Change password";
+                break;
+            case "login":
+            default:
+                cc = "Login";
+                break;
+        }
+        return cc;
+    }
 
     useEffect(() => {
         setContent(switchMode());
+        setButton(switchButton());
         setMessage("");
     }, [mode]);
 
@@ -102,7 +187,7 @@ function AuthWindow(props: AuthWindowProps) {
             <div className='auth-window-inner'>
                 {content}
                 <p className="warn-message">{message}</p>
-                <button className={disabled ? "disable" : ""}  onClick={() => auth(mode)} >{mode}</button>
+                {(disabled && (mode === "register" || mode === "pass-input-pass"))  ? <p>{button}</p> : (<button  onClick={() => auth(mode)} >{button}</button>)}
             </div>
         </div>
         }

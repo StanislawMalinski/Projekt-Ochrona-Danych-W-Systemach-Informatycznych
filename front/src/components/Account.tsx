@@ -11,6 +11,7 @@ function Account(props: AccountProps) {
     
     return (credentials ? 
         <>
+         <div className="account-view">
             <h1>Account</h1>
             <p>Account Number: {credentials.accountNumber}</p>
             <p>Balance: {credentials.balance.toFixed(2)}</p>
@@ -54,6 +55,7 @@ function Account(props: AccountProps) {
             </div>
             <button onClick={() => newTransfer()}>New Transfer</button>
             <button onClick={() => logOut()}>LogOut</button>
+        </div>
         </>:
         <>  </>
     )

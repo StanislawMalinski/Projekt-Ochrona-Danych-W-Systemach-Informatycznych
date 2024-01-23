@@ -9,6 +9,10 @@
   color: gray;
 }
 
+body {
+  background-color: #1a1a1a;
+}
+
 input {
   border: 1px solid gray;
   height: 30px;
