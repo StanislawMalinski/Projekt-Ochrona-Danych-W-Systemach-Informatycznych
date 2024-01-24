@@ -5,6 +5,7 @@ using projekt.Models.Enums;
 
 using System.Text.Json;
 using System.Linq;
+using projekt.Models.Dtos;
 
 namespace projekt.Controllers;
 
@@ -19,6 +20,18 @@ public class BankController : ControllerBase
     {
         _bankService = bankService;
         _activityService = activityService;
+    }
+
+    [HttpGet("token")]
+    public IActionResult GetToken([FromQuery] string accountNumber)
+    {
+        return Ok(CryptoService.signToken(accountNumber));
+    }
+
+    [HttpPost("vtoken")]
+    public IActionResult VerifyToken([FromBody] Token token)
+    {
+        return Ok(CryptoService.verifyToken(token));
     }
 
     [HttpPost("login")]

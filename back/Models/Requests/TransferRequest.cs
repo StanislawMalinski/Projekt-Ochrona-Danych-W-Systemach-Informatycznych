@@ -1,4 +1,5 @@
 using projekt.Serivces;
+using projekt.Models.Dtos;
 
 namespace projekt.Models.Requests
 {
@@ -12,13 +13,14 @@ namespace projekt.Models.Requests
             Recipient = "";
             Value = 0;
             Title = "";
+            token = new Token();
         }
         public required string AccountNumber { get; set; }
         public required string RecipientAccountNumber { get; set; }
         public required string Recipient { get; set; }
         public required decimal Value { get; set; }
         public required string Title { get; set; }
-
+        public required Token token { get; set; }
         public bool IsValid()
         {
             return  Validator.validNumber(AccountNumber) && 

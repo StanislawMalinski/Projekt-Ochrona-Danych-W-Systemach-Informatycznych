@@ -2,6 +2,8 @@ import { sha256 } from "crypto-hash";
 import  secureLocalStorage  from  "react-secure-storage";
 import config from "../../clientconfig.json"
 import CryptoJS from "crypto-js";
+import * as base64 from 'base64-js';
+
 const iv_ = "0535627058893800";
 
 async function hash(password: string) {
@@ -35,6 +37,43 @@ function deleteCredentials() {
 }
 
 function saveServerPubKey(key: string) {
+
+
+
+    function extractModulusExponent(xmlString: string): [bigint, bigint] | null {
+        const modulusMatch = xmlString.match(/<Modulus>(.*?)<\/Modulus>/);
+        const exponentMatch = xmlString.match(/<Exponent>(.*?)<\/Exponent>/);
+    
+        if (modulusMatch && exponentMatch) {
+            const modulusBase64 = modulusMatch[1];
+            const exponentBase64 = exponentMatch[1];
+    
+            // Decode base64 values
+            const modulusBytes = base64.toByteArray(modulusBase64);
+            const exponentBytes = base64.toByteArray(exponentBase64);
+    
+            // Convert bytes to BigInt
+            const modulus = Buffer.from(modulusBytes).readBigInt64BE();
+            const exponent = Buffer.from(exponentBytes).readBigInt64BE();
+    
+            return [modulus, exponent];
+        } else {
+            return null;
+        }
+    }
+    
+    // Example usage:
+    const xmlString = "<RSAKeyValue><Modulus>1Ur...gS=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
+    const result = extractModulusExponent(xmlString);
+    
+    if (result) {
+        const [modulus, exponent] = result;
+        console.log(`Modulus: ${modulus}`);
+        console.log(`Exponent: ${exponent}`);
+    } else {
+        console.log("Modulus and Exponent not found in the given XML string.");
+    }
+
     secureLocalStorage.setItem("serverKey", key);
 }
 

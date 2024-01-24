@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using projekt.Models.Dtos;
 
 namespace projekt.Serivces
 {
@@ -16,54 +17,32 @@ namespace projekt.Serivces
             return Convert.ToBase64String(cipher);
         }
 
+        public static Token signToken(string accountNumber)
+        {
+            var data = Encoding.UTF8.GetBytes(accountNumber);
+            var cipher = rsa.Encrypt(data, false);
+            var token = new Token();
+            token.AccountNumber = accountNumber;
+            token.Sign = Convert.ToBase64String(cipher);
+            return token;
+        }
+
+        public static bool verifyToken(Token token)
+        {
+            try{
+            var data = Convert.FromBase64String(token.Sign);
+            var plain = rsa.Decrypt(data, false);
+            return Encoding.UTF8.GetString(plain) == token.AccountNumber;
+            } catch {
+                return false;
+            }
+        }
+
         /*
             test
             KMbrdiERGMLY5KBgn/8wmQ==
             test
         */
-
-        public static string aes(string text, string key, string mode)
-        {
-            byte[] encrypted;
-            string plaintext;
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = Encoding.UTF8.GetBytes(key);
-                aesAlg.IV = Encoding.UTF8.GetBytes(iv_);
-
-                if (mode == "enc"){
-                    var encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
-                    using (MemoryStream msEncrypt = new MemoryStream())
-                    {
-                        using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
-                        {
-                            using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
-                            {
-                                swEncrypt.Write(text);
-                            }
-                            encrypted = msEncrypt.ToArray();
-                        }
-                    }
-                    return Convert.ToBase64String(encrypted);
-                } else if (mode == "dec"){
-                    var decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-                    using (MemoryStream msDecrypt = new MemoryStream( Encoding.UTF8.GetBytes(text)))
-                    {
-                        using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-                        {
-                            using (StreamReader srDecrypt = new StreamReader(csDecrypt))
-                            {
-
-                                plaintext = srDecrypt.ReadToEnd();
-                            }
-                        }
-                    }
-                    return plaintext;
-                } else {
-                    throw new Exception("Invalid mode");
-                }
-            }
-        }
 
         public static string GetPublicKey()
         {
