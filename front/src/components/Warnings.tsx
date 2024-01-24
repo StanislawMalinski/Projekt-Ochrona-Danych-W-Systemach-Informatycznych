@@ -42,7 +42,7 @@ function Warnings(props: WarningsProps) {
     useEffect(() => {
         getactivities(credentials as string)
             .then((response) => {
-                console.log(response);
+                ;
                 setActivities(response);
             });
     }, [logged]);

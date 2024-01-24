@@ -8,10 +8,8 @@ namespace projekt.Models.Requests
         public PassChangeRequestCode()
         {
             Email = "";
-            token= new Token();
         } 
         public required string Email { get; set; }
-        public required Token token { get; set; }
         public bool IsValid()
         {
             return Validator.validEmail(Email);

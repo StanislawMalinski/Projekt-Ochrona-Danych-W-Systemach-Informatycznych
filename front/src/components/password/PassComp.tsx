@@ -19,7 +19,7 @@ function PassComp(props: PassCompProps){
 
     useEffect(() => {
         setPass(internalPass);
-        console.log("pass: ", internalPass);
+        ;
     }, [internalPass]);
 
     return(

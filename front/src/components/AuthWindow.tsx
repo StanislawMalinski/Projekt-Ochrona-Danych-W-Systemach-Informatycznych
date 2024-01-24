@@ -4,7 +4,7 @@ import LoginComp from './auth/LoginComp';
 import RegisterComp from './auth/RegisterComp';
 
 import {login, register, passwordchangerequestcode, codesubmit, submitregistrationcode, passwordchange} from '../Client';
-import { saveCredentials } from '../utils/Cipher';
+import { getToken, saveCredentials } from '../utils/Cipher';
 import PassChangeComp from './auth/PassChangeComp';
 
 
@@ -39,15 +39,16 @@ function AuthWindow(props: AuthWindowProps) {
     }, [mode, logged]);
 
     const auth = (m: string ) => {
-        console.log(m)
+       
         switch (m) {
             case "login":
                 login(loginRequest)
                 .then((response) => {
                     if (response.success) {
-                        saveCredentials(loginRequest.email, loginRequest.password)
+                        saveCredentials(loginRequest.email, loginRequest.password, JSON.stringify(response.token))
                         setLogged(true);
-                        setAccount(response);
+                        const { token, ...account } = response;
+                        setAccount(account);
                     } 
                     setMessage(response.message);
                 });
@@ -73,13 +74,10 @@ function AuthWindow(props: AuthWindowProps) {
             case "pass-input-mail":
                 passwordchangerequestcode(codeChangePasswordRequest)
                 .then((response) => {
-                    console.log(response)
                     if (response.success) {
                         setMode("pass-input-code");
-                        console.log("zmieniono tryb")
                     } else {
                         setMessage(response.message);
-                        console.log("nie zmieniono trybu")
                     }
                     setMessage(response.message);
                 });

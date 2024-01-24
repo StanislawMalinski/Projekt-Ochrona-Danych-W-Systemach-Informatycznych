@@ -22,22 +22,10 @@ public class BankController : ControllerBase
         _activityService = activityService;
     }
 
-    [HttpGet("token")]
-    public IActionResult GetToken([FromQuery] string accountNumber)
-    {
-        return Ok(CryptoService.signToken(accountNumber));
-    }
-
-    [HttpPost("vtoken")]
-    public IActionResult VerifyToken([FromBody] Token token)
-    {
-        return Ok(CryptoService.verifyToken(token));
-    }
-
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request)
     {
-        Thread.Sleep(1000);
+        Thread.Sleep(100);
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
         if (!request.IsValid())
             return BadRequest("Email or password cannot be empty");
@@ -54,7 +42,7 @@ public class BankController : ControllerBase
     [HttpPost("register")]
     public IActionResult register([FromBody] RegisterRequest request)
     {
-        Thread.Sleep(1000);
+        Thread.Sleep(100);
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
         if (!request.IsValid())
             return BadRequest("Email or password cannot be empty");
@@ -71,7 +59,7 @@ public class BankController : ControllerBase
     [HttpPost("code-submit-register")]
     public IActionResult CodeSubmitRegister([FromBody] CodeSubmitRequest request)
     {
-        Thread.Sleep(1000);
+        Thread.Sleep(100);
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
         if (!request.IsValid())
             return BadRequest("Email or password cannot be empty");
@@ -88,7 +76,7 @@ public class BankController : ControllerBase
     [HttpPost("pass-change-request-code")]
     public IActionResult PassChangeRequest([FromBody] PassChangeRequestCode request)
     {
-        Thread.Sleep(1000);
+        Thread.Sleep(100);
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
         if (!request.IsValid())
             return BadRequest("Email cannot be empty");
@@ -105,7 +93,7 @@ public class BankController : ControllerBase
     [HttpPost("code-submit-pass-change")]
     public IActionResult CodeSubmit([FromBody] CodeSubmitRequest request)
     {
-        Thread.Sleep(1000);
+        Thread.Sleep(100);
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
         if (!request.IsValid())
             return BadRequest("Email or password cannot be empty");
@@ -122,7 +110,7 @@ public class BankController : ControllerBase
     [HttpPost("pass-change")]
     public IActionResult PassChange([FromBody] PasswordChangeRequest request)
     {
-        Thread.Sleep(1000);
+        Thread.Sleep(100);
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
         if (!request.IsValid())
             return BadRequest("Email or password cannot be empty");
@@ -139,10 +127,11 @@ public class BankController : ControllerBase
     [HttpPost("transfer")]
     public IActionResult Transfer([FromBody] TransferRequest request)
     {
-        Thread.Sleep(1000);
+        Thread.Sleep(100);
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (!request.IsValid())
+        if (!request.Token.isValid() || request.Token.AccountNumber != request.AccountNumber)
             return BadRequest("You made some errors");
+        
         try{
             var response = _bankService.NewTransfer(request);
             _activityService.LogActivity(ActivityType.NewTransfer, request.RecipientAccountNumber, origin, response.Success);
@@ -158,7 +147,7 @@ public class BankController : ControllerBase
     [HttpPost("account")]
     public IActionResult Account([FromBody] AccountRequest request)
     {
-        Thread.Sleep(1000);
+        Thread.Sleep(100);
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
         if (!request.IsValid())
             return BadRequest("Email cannot be empty");
@@ -182,7 +171,7 @@ public class BankController : ControllerBase
     [HttpGet("activities")]
     public IActionResult GetActivities([FromQuery] string email)
     {
-        Thread.Sleep(1000);
+        Thread.Sleep(100);
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
         if (Validator.validEmail(email) == false)
             return BadRequest("Invalid email");

@@ -54,7 +54,7 @@ public class ActivityService : IActivityService
     {
         if (AssociatedEmailOrAccountNumber.Contains("@"))
             return AssociatedEmailOrAccountNumber;
-        return _accountRepository.GetAccount(AssociatedEmailOrAccountNumber).Email;
+        return _accountRepository.GetAccount(AssociatedEmailOrAccountNumber).Email ?? null;
     }
 
     public void LogActivity(ActivityType type, bool success)

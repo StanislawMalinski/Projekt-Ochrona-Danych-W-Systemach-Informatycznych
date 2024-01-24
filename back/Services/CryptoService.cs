@@ -17,7 +17,7 @@ namespace projekt.Serivces
             return Convert.ToBase64String(cipher);
         }
 
-        public static Token signToken(string accountNumber)
+        public static Token GenerateToken(string accountNumber)
         {
             var data = Encoding.UTF8.GetBytes(accountNumber);
             var cipher = rsa.Encrypt(data, false);

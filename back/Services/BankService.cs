@@ -97,7 +97,8 @@ public class BankService : IBankService
             Balance = result.Balance,
             History = _transferRepository.GetHistory(result.AccountNumber),
             Message = "Login successful.",
-            Success = true
+            Success = true,
+            Token = CryptoService.GenerateToken(result.AccountNumber)
         };
     }
 
@@ -139,7 +140,8 @@ public class BankService : IBankService
             Balance = account.Balance,
             History = _transferRepository.GetHistory(account.AccountNumber),
             Message = "Transfer was successful.",
-            Success = true
+            Success = true,
+            Token = CryptoService.GenerateToken(account.AccountNumber)
         };
     }
 

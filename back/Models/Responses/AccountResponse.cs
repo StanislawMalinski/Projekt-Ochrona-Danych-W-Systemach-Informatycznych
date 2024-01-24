@@ -19,11 +19,13 @@ namespace projekt.Models.Responses
             History = new List<Transfer>();
             Message = message;
             Success = false;
+            Token = new Token();
         }
         public required string AccountNumber { get; set; }
         public required decimal Balance { get; set; }
         public required List<Transfer>  History {get; set; }
         public string Message { get; set; }
         public bool Success { get; set; }
+        public Token Token { get; set; }
     }
 }
