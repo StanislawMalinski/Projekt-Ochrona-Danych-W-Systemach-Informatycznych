@@ -1,16 +1,17 @@
 
 
-using projekt.Serivces;
+using projekt.Services;
 using projekt.Models.Dtos;
 namespace projekt.Models.Requests;
 
-public class CodeSubmitRequest
+public class CodeSubmitRequest :BasicRequest
 {
     public string Email { get; set; }
     public string Code { get; set; }
-    public required Token token { get; set; }
-    public bool IsValid()
+    public override string IsValid()
     {
-        return Validator.validEmail(Email) && Validator.validCode(Code);
+        if (!Validator.validEmail(Email)) return "Email is not valid";
+        if (!Validator.validCode(Code)) return "Code is not valid";
+        return "";
     }
 }

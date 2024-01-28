@@ -23,7 +23,7 @@ function TransferWindow(prop: TransferWindowProps) {
         transfer({accountNumber: accountNumber, recipientAccountNumber: recipientAccountNumber, recipient: recipient, value: value, title: title})
         .then((response) => {
             if (response) {
-                console.log(response)
+                (response)
                 if (response.success) {
                     relod();
                     close();

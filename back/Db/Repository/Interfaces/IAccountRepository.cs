@@ -1,6 +1,7 @@
 using projekt.Models.Dtos;
 using projekt.Models.Requests;
-namespace projekt.Db.Repository;
+
+namespace projekt.Db.Repository.Interfaces;
 
 public interface IAccountRepository
 {

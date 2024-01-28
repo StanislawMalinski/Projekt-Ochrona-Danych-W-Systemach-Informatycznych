@@ -10,5 +10,6 @@ namespace projekt.Db.BankContext
         public DbSet<Transfer> Transfers { get; set; }
         public DbSet<Activity> Activities { get; set; }
         public DbSet<Verification> Verifications { get; set; }
+        public DbSet<Timeouts> TimeOuts { get; set; }
     }
 }

@@ -1,20 +1,19 @@
-using projekt.Serivces;
+using projekt.Services;
 
 using projekt.Models.Dtos;
 namespace projekt.Models.Requests
 {
-    public class PassChangeRequestCode
+    public class PassChangeRequestCode: BasicRequest
     {
         public PassChangeRequestCode()
         {
             Email = "";
-            token= new Token();
         } 
         public required string Email { get; set; }
-        public required Token token { get; set; }
-        public bool IsValid()
+        public override string IsValid()
         {
-            return Validator.validEmail(Email);
+            if (!Validator.validEmail(Email)) return "Email is not valid";
+            return "";
         }
     }
 }

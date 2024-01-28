@@ -1,7 +1,7 @@
 
 namespace projekt.Models.Responses
 {
-    public class LoginResponse
+    public class LoginResponse : BasicResponse
     {
         public LoginResponse()
         {
@@ -12,7 +12,5 @@ namespace projekt.Models.Responses
         }
         public required string AccountNumber { get; set; }
         public required decimal Balance { get; set; }
-        public required string Message { get; set; }
-        public required bool Success { get; set; }
     }
 }

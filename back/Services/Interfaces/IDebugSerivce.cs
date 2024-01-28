@@ -1,7 +1,6 @@
 using projekt.Models.Dtos;
 
-namespace projekt.Serivces;
-
+namespace projekt.Services.Interfaces;
 
 public interface IDebugSerivce
 {

@@ -1,16 +1,18 @@
-using projekt.Serivces;
+using projekt.Services;
 using projekt.Models.Dtos;
 namespace projekt.Models.Requests
 {
-    public class PasswordChangeRequest
+    public class PasswordChangeRequest : BasicRequest
     {
         public string Email { get; set; }
         public string Code { get; set; }
         public string Password { get; set; }
-        public required Token token { get; set; }
-        public bool IsValid()
+        public override string IsValid()
         {
-            return Validator.validEmail(Email) && Validator.validCode(Code);
+            if (!Validator.validCode(Code)) return "Code is not valid";
+            if (string.IsNullOrEmpty(Email))
+                return "Email is not valid";
+            return "";
         }
     }
 }

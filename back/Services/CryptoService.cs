@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using projekt.Models.Dtos;
 
-namespace projekt.Serivces
+namespace projekt.Services
 {
     public class CryptoService
     {
@@ -17,7 +17,7 @@ namespace projekt.Serivces
             return Convert.ToBase64String(cipher);
         }
 
-        public static Token signToken(string accountNumber)
+        public static Token GenerateToken(string accountNumber)
         {
             var data = Encoding.UTF8.GetBytes(accountNumber);
             var cipher = rsa.Encrypt(data, false);

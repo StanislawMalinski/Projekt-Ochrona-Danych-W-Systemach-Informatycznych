@@ -1,10 +1,12 @@
 
 using projekt.Db.Repository;
+using projekt.Db.Repository.Interfaces;
 using projekt.Models.Requests;
 using projekt.Models.Responses;
 using projekt.Models.Dtos;
+using projekt.Services.Interfaces;
 
-namespace projekt.Serivces;
+namespace projekt.Services;
 
 public class BankService : IBankService
 {
@@ -12,71 +14,53 @@ public class BankService : IBankService
     private readonly ITransferRepository _transferRepository;
     private readonly IVerificationRepository _verificationRepository;
     private readonly IDebugSerivce _debug_service;
+    private readonly IConfiguration _congifuration;
 
-    public BankService(IAccountRepository accountRepository, ITransferRepository transferRepository, IVerificationRepository verificationRepository, IDebugSerivce debug_service)
+    public BankService(IAccountRepository accountRepository, 
+        ITransferRepository transferRepository, 
+        IVerificationRepository verificationRepository, 
+        IDebugSerivce debug_service,
+        IConfiguration configuration)
     {
         _accountRepository = accountRepository;
         _transferRepository = transferRepository;
         _verificationRepository = verificationRepository;
         _debug_service = debug_service;
+        _congifuration = configuration;
     }
 
-    public SimpleResponse Register(RegisterRequest request)
+    public BasicResponse Register(RegisterRequest request)
     {
         var accountExists = _accountRepository.CheckIfAccountExistsByEmail(request.Email);
-        if(accountExists) { return new SimpleResponse { Message = "Account with this email already exists.", Success = false };}
+        if(accountExists) return new BasicResponse { Message = "Account with this email already exists.", Success = false };
         var result = _accountRepository.Register(request);
         var verification_code = GenerateVerificationCode();
         _verificationRepository.CreateVerification(request.Email, verification_code);
         SendVerificationMessage(request.Email, verification_code);
-        return new SimpleResponse{
-            Message = "Awaits for verification.",
-            Success = true
-        };
+        return new BasicResponse{Message = "Awaits for verification.",Success = true};
     }
 
-    public SimpleResponse CodeSubmitRegister(CodeSubmitRequest request){
+    public BasicResponse CodeSubmitRegister(CodeSubmitRequest request){
         var accountExists = _accountRepository.CheckIfNotVerifiedAccountExistsByEmail(request.Email);
         if(!accountExists) { 
-            return new SimpleResponse {
-                Message = "Sorry, your validation code has expiered.",
-                Success = false
-            }; 
+            return new BasicResponse {Message = "Sorry, your validation code has expiered.",Success = false}; 
         }
         var verificationIsValid = _verificationRepository.CheckIfVerificationIsValid(request.Email, request.Code);
         if(!verificationIsValid) { 
-            return new SimpleResponse {
-                Message = "Sorry, your validation code has expiered.",
-                Success = false
-            }; 
+            return new BasicResponse {Message = "Sorry, your validation code has expiered.", Success = false}; 
         }
         _accountRepository.VerifyAccount(request.Email);
         _verificationRepository.DeleteVerification(request.Email);
-        return new SimpleResponse {
-            Message = "Account has been verified. Please try to login now...",
-            Success = true
-        };
+        return new BasicResponse {Message = "Account has been verified. Please try to login now...", Success = true};
     }
 
     public AccountResponse GetAccount(AccountRequest request)
     {
         var result = _accountRepository.GetAccountByEmail(request.Email);
         if(result == null) 
-            return new AccountResponse {
-                AccountNumber = "",
-                Balance = 0,
-                History = [],
-                Message = "Account with this number does not exist.",
-                Success = false
-            };
+            return new AccountResponse("Account with this number does not exist.");
         if (!result.IsVerified) 
-            return new AccountResponse {
-                AccountNumber = "",
-                Balance = 0,
-                History = [],
-                Message = "Account is not verified.",
-                Success = false
-            };
+            return new AccountResponse("Account is not verified.");
         return new AccountResponse{
             AccountNumber = result.AccountNumber,
             Balance = result.Balance,
@@ -88,16 +72,17 @@ public class BankService : IBankService
     public AccountResponse Login(LoginRequest request)
     {
         var validUser = _accountRepository.validUser(request);
-        if(!validUser)  return new AccountResponse { AccountNumber = "", Balance = 0, History = new List<Transfer>(), Message = "Invalid email or password.", Success = false };
+        if(!validUser)  return new AccountResponse("Invalid email or password.");
         var result = _accountRepository.GetAccountByEmail(request.Email);
-        if (result == null)  return new AccountResponse { AccountNumber = "", Balance = 0, History = new List<Transfer>(), Message = "Account with this email does not exist.", Success = false };
-        if (!result.IsVerified)  return new AccountResponse { AccountNumber = "", Balance = 0, History = new List<Transfer>(), Message = "Account is not verified.", Success = false };
+        if (result == null)  return new AccountResponse ("Account with this email does not exist.");
+        if (!result.IsVerified)  return new AccountResponse("Account is not verified.");
         return new AccountResponse{
             AccountNumber = result.AccountNumber,
             Balance = result.Balance,
             History = _transferRepository.GetHistory(result.AccountNumber),
             Message = "Login successful.",
-            Success = true
+            Success = true,
+            Token = CryptoService.GenerateToken(result.AccountNumber)
         };
     }
 
@@ -105,22 +90,22 @@ public class BankService : IBankService
     {
         var accountExists = _accountRepository.CheckIfAccountExistsByAccountNumber(request.RecipientAccountNumber);
         if (!accountExists) 
-            return new AccountResponse { AccountNumber = "", Balance = 0, History = new List<Transfer>(), Message = "Recipient account does not exist.", Success = false };
+            return new AccountResponse("Recipient account does not exist.");
         accountExists = _accountRepository.CheckIfAccountExistsByAccountNumber(request.AccountNumber);
         if (!accountExists) 
-            return new AccountResponse { AccountNumber = "", Balance = 0, History = new List<Transfer>(), Message ="Sender account does not exist.", Success = false};
+            return new AccountResponse ("Sender account does not exist.");
         if (request.Value <= 0) 
-            return new AccountResponse { AccountNumber = "", Balance = 0, History = new List<Transfer>(), Message ="Your resources are insufficient.", Success = false};
+            return new AccountResponse ("Your resources are insufficient.");
         if (!_accountRepository.isTransferPossible(request.AccountNumber, request.Value)) 
-            return new AccountResponse { AccountNumber = "", Balance = 0, History = new List<Transfer>(), Message ="Your resources are insufficient.", Success = false};
+            return new AccountResponse ("Your resources are insufficient.");
         var account = _accountRepository.GetAccount(request.AccountNumber);
         var recipient = _accountRepository.GetAccount(request.RecipientAccountNumber);
         if (!account.IsVerified) 
-            return new AccountResponse { AccountNumber = "", Balance = 0, History = new List<Transfer>(), Message ="Sender account does not exist.", Success = false};
+            return new AccountResponse ("Sender account does not exist.");
         if (!recipient.IsVerified)
-            return new AccountResponse { AccountNumber = "", Balance = 0, History = new List<Transfer>(), Message ="Recipient account does not exist.", Success = false};
+            return new AccountResponse ("Recipient account does not exist.");
         if (account.AccountNumber == recipient.AccountNumber) 
-            return new AccountResponse { AccountNumber = "", Balance = 0, History = new List<Transfer>(), Message ="You cannot transfer money to yourself.", Success = false};
+            return new AccountResponse ("You cannot transfer money to yourself.");
         var transfer = new Transfer{
             AccountNumber = request.AccountNumber,
             RecipentAccountNumber = recipient.AccountNumber,
@@ -139,7 +124,8 @@ public class BankService : IBankService
             Balance = account.Balance,
             History = _transferRepository.GetHistory(account.AccountNumber),
             Message = "Transfer was successful.",
-            Success = true
+            Success = true,
+            Token = CryptoService.GenerateToken(account.AccountNumber)
         };
     }
 
@@ -158,6 +144,7 @@ public class BankService : IBankService
     {
         Random random = new Random();
         string verificationCode = "";
+        var lenCode = _congifuration.GetValue<int>("BankService:VerificationCodeLength");
         for (int i = 0; i < 6; i++)
         {
             verificationCode += random.Next(0, 9);
@@ -165,7 +152,7 @@ public class BankService : IBankService
         return verificationCode;
     }
 
-    public SimpleResponse ChangePasswordCodeRequest(PassChangeRequestCode request)
+    public BasicResponse ChangePasswordCodeRequest(PassChangeRequestCode request)
     {
         var accountExists = _accountRepository.CheckIfAccountExistsByEmail(request.Email);
         if(accountExists){
@@ -173,72 +160,31 @@ public class BankService : IBankService
             _verificationRepository.CreateVerification(request.Email, verification_code);
             SendPasswordMessageChange(request.Email, verification_code);
         }   
-        return new SimpleResponse { Message = "The email with verification code was sent this email address", Success = true};
+        return new BasicResponse { Message = "The email with verification code was sent this email address", Success = true};
     }
 
-    public SimpleResponse CodeSubmit(CodeSubmitRequest request)
+    public BasicResponse CodeSubmit(CodeSubmitRequest request)
     {
         var accountExists = _accountRepository.CheckIfAccountExistsByEmail(request.Email);
-        if(!accountExists) { 
-            return new SimpleResponse {
-                Message = "Sorry, your validation code has expiered.",
-                Success = false
-            }; 
-        }
+        if(!accountExists) return new BasicResponse {Message = "Sorry, your validation code has expiered.",Success = false}; 
         var verificationIsValid = _verificationRepository.CheckIfVerificationIsValid(request.Email, request.Code);
-        if(!verificationIsValid) { 
-            return new SimpleResponse {
-                Message = "Sorry, your validation code has expiered.",
-                Success = false
-            }; 
-        }
-        return new SimpleResponse {
-            Message = "Verification has been succesful.",
-            Success = true
-        };
+        if(!verificationIsValid) return new BasicResponse {Message = "Sorry, your validation code has expiered.",Success = false}; 
+        return new BasicResponse { Message = "Verification has been succesful.", Success = true};
     }
 
-    public SimpleResponse ChangePassword(PasswordChangeRequest request)
+    public BasicResponse ChangePassword(PasswordChangeRequest request)
     {
         var accountExists = _accountRepository.CheckIfAccountExistsByEmail(request.Email);
-        if(!accountExists) { 
-            return new SimpleResponse {
-                Message = "Sorry, your validation code has expiered.",
-                Success = false
-            }; 
-        }
+        if(!accountExists) return new BasicResponse {Message = "Sorry, your validation code has expiered.",Success = false}; 
         var verificationIsValid = _verificationRepository.CheckIfVerificationIsValid(request.Email, request.Code);
-        if(!verificationIsValid) { 
-            return new SimpleResponse {
-                Message = "Sorry, your validation code has expiered.",
-                Success = false
-            }; 
-        }
+        if(!verificationIsValid) return new BasicResponse {Message = "Sorry, your validation code has expiered.",Success = false}; 
         _accountRepository.ChangePassword(request.Email, request.Password);
         _verificationRepository.DeleteVerification(request.Email);
-        return new SimpleResponse {
-            Message = "Password has been changed.",
-            Success = true
-        };
+        return new BasicResponse {Message = "Password has been changed.",Success = true};
+    }
+
+    public bool ValidateToken(Token token)
+    {
+        return CryptoService.verifyToken(token);
     }
 }
-
-/*
- public PassChangeResponse ChangePassword(PassChangeRequestCode request)
-    {   
-        var accountExists = _accountRepository.CheckIfAccountExistsByEmail(request.Email);
-        if(!accountExists) { 
-            return new PassChangeResponse {
-                Message = "Account with this email does not exist.",
-                Success = false
-            }; 
-        }
-        var verification_code = GenerateVerificationCode();
-        _verificationRepository.CreateVerification(request.Email, verification_code);
-        SendPasswordMessageChange(request.Email, verification_code);
-        return new PassChangeResponse {
-            Message = "Verification code was sent to your email.",
-            Success = true
-        };
-    }
-    */

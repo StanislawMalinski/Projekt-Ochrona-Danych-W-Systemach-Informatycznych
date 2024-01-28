@@ -2,8 +2,10 @@
 using projekt.Models.Enums;
 using projekt.Models.Dtos;
 using projekt.Db.Repository;
+using projekt.Db.Repository.Interfaces;
+using projekt.Services.Interfaces;
 
-namespace projekt.Serivces;
+namespace projekt.Services;
 
 public class ActivityService : IActivityService
 {
@@ -52,22 +54,10 @@ public class ActivityService : IActivityService
 
     private string GetEmail(string AssociatedEmailOrAccountNumber)
     {
-        if (AssociatedEmailOrAccountNumber.Contains("@"))
+        if (AssociatedEmailOrAccountNumber.Contains('@'))
             return AssociatedEmailOrAccountNumber;
-        return _accountRepository.GetAccount(AssociatedEmailOrAccountNumber).Email;
-    }
-
-    public void LogActivity(ActivityType type, bool success)
-    {
-        var activity = new Activity
-        {
-            Id = 0,
-            Date = DateTime.Now,
-            Origin = "",
-            Type = type,
-            Success = success
-        };
-        publishActivity(activity);
+        var account = _accountRepository.GetAccount(AssociatedEmailOrAccountNumber);
+        return account != null ? account.Email : AssociatedEmailOrAccountNumber;
     }
 
     private void publishActivity(Activity activity)

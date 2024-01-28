@@ -18,6 +18,7 @@ namespace projekt.Db.Repository
 
         public Activity LogActivity(Activity activity)
         {
+            cleanUp();
              _bankDbContext.Activities.Add(activity);
              _bankDbContext.SaveChanges();
             return activity;
@@ -25,9 +26,27 @@ namespace projekt.Db.Repository
 
         public  List<Activity> GetActivities(string email)
         {
+            cleanUp();
             return _bankDbContext.Activities
-                .Where(a => a.AssociatedEmail == email).ToList();
+                .Where(a => a.AssociatedEmail == email)
+                .ToList();
         }
 
+        public int GetAcitivityCountForLastNMinutes(string origin, int minutes)
+        {
+            cleanUp();
+            return _bankDbContext.Activities
+                .Where(a => a.AssociatedEmail == origin)
+                .Where(a => a.Date >= DateTime.Now.AddMinutes(-minutes))
+                .Count();
+        }
+
+        private void cleanUp(){
+            _bankDbContext.Activities
+                .Where(a => a.Date < DateTime.Now.AddDays(-7))
+                .ToList()
+                .ForEach(a => _bankDbContext.Activities.Remove(a));
+            _bankDbContext.SaveChanges();
+        }
     }
 }

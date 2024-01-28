@@ -2,8 +2,8 @@
 using projekt.Db.BankContext;
 using projekt.Models.Dtos;
 using projekt.Models.Requests;
-using projekt.Models.Responses;
-using projekt.Serivces;
+using projekt.Services;
+using projekt.Db.Repository.Interfaces;
 
 namespace projekt.Db.Repository;
 

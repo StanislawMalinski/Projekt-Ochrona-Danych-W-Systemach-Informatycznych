@@ -1,5 +1,5 @@
 import config from '../clientconfig.json';
-import { saveServerPubKey } from './utils/Cipher';
+import { getToken, hashPassword, saveServerPubKey } from './utils/Cipher';
 
 var baseUrl = '';
 var accessControlAllowOrigin = '';
@@ -44,6 +44,7 @@ function register(body: any) {
 }
 
 function submitregistrationcode(body: any) {
+    body.token = getToken();
     return fetch(baseUrl + config.urls.submitregistrationcode, {
         method: 'POST',
         headers: {
@@ -51,15 +52,11 @@ function submitregistrationcode(body: any) {
             'Access-Control-Allow-Origin': accessControlAllowOrigin
         },
         body: JSON.stringify(body)
-    }).then((response) => {
-        console.log(response);
-        if (response.status === 200) {
-            return response.json();
-        }
-    });
+    }).then((response) => { return response.json(); });
 }
 
 function passwordchangerequestcode(body: any) {
+    body.token = getToken();
     return fetch(baseUrl + config.urls.passwordchangerequestcode, {
         method: 'POST',
         headers: {
@@ -75,6 +72,7 @@ function passwordchangerequestcode(body: any) {
 }
 
 function codesubmit(body: any) {
+    body.token = getToken();
     return fetch(baseUrl + config.urls.codesubmit, {
         method: 'POST',
         headers: {
@@ -91,6 +89,8 @@ function codesubmit(body: any) {
 
 // require password
 function passwordchange(body: any) {
+    body.token = getToken();
+    body.password = hashPassword(body.password)
     return fetch(baseUrl + config.urls.passwordchange, {
         method: 'POST',
         headers: {
@@ -106,6 +106,9 @@ function passwordchange(body: any) {
 }
 
 function transfer(body: any) {
+    body.token = getToken();
+    (body);
+    (getToken());
     return fetch(baseUrl + config.urls.transfer, {
         method: 'POST',
         headers: {
@@ -121,6 +124,7 @@ function transfer(body: any) {
 }
 
 function account(body: any) {
+    body.token = getToken();
     return fetch(baseUrl + config.urls.account, {
         method: 'POST',
         headers: {
@@ -128,8 +132,7 @@ function account(body: any) {
             'Access-Control-Allow-Origin': accessControlAllowOrigin
         },
         body: JSON.stringify(body)
-    }).then((response) => {
-        console.log(response);
+    }).then((response) => {;
         if (response.status === 200) {
             return response.json();
         }
@@ -144,26 +147,25 @@ function getPubKey() {
             'Access-Control-Allow-Origin': accessControlAllowOrigin
         }
     }).then((response) => {
-        if (response.status === 200) {
-            console.log(response);
-            response.json().then((data) => {
-                console.log(data);
-                saveServerPubKey(data);
+        if (response.status === 200) {;
+            response.text().then((text) => {
+                saveServerPubKey(text);
             });
         }
     });
 }
 
 function getactivities(email: string) {
+    const body: { token: string } = getToken();
     return fetch(baseUrl + config.urls.activities + email, {
-        method: 'GET',
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': accessControlAllowOrigin
-        }
+        },
+        body: JSON.stringify(body)
     }).then((response) => {
-        if (response.status === 200) {
-            console.log(response);
+        if (response.status === 200) {;
             return response.json();
         }
     });
@@ -179,3 +181,5 @@ export {login,
         account, 
         getPubKey,
         getactivities}
+
+

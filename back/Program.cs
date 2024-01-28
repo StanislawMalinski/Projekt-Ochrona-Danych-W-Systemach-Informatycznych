@@ -1,7 +1,11 @@
-using projekt.Serivces;
+using projekt.Services;
+using projekt.Services.Interfaces;
+using projekt.Services.Interfaces;
 using projekt.Db.BankContext;
 using projekt.Db.Repository;
+using projekt.Db.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -16,13 +20,17 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IBankService, BankService>();
 builder.Services.AddScoped<IActivityService, ActivityService>();
+builder.Services.AddScoped<IAccessService, AccessService>();
+builder.Services.AddScoped<IDebugSerivce, DebugService>();
 
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ITransferRepository, TransferRepository>();
 builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
 builder.Services.AddScoped<IVerificationRepository, VerificationRepository>();
+if (config.GetSection("Mode").Get<string>() == "Development")
+    builder.Services.AddScoped<ITimeOutRepository, TimeOutRepository>();
 
-builder.Services.AddScoped<IDebugSerivce, DebugService>();
+builder.Services.AddSingleton<IConfiguration>(config);
 
 var myPolicy = "MyCorsePolicy";
 builder.Services.AddCors(options =>

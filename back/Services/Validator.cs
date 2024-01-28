@@ -1,25 +1,31 @@
 
 
-namespace projekt.Serivces
+namespace projekt.Services
 {
     public class Validator
     {
-     
+        private static IConfiguration? _configuration;
+
+        public Validator(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
         public static bool validEmail(string email){ 
             var validChars = new HashSet<char> {'@', '.', '_', '-'};
             foreach (var c in email)
                 if (!char.IsLetterOrDigit(c) && !validChars.Contains(c))
                     return false;
-            return true;
+            return email.Contains('@');
         }
 
-        public static  bool validCode(string code)
+        public static bool validCode(string code)
         {
             bool valid = true;
             foreach (var c in code)
                 if (!char.IsDigit(c))
                     valid = false;
-            valid = valid && code.Length == 6;
+            var lenCode = _configuration?.GetValue<int>("BankService:VerificationCodeLength");
+            valid = valid && code.Length == ((lenCode != null) ? lenCode : 6);
             return valid;
         }
 

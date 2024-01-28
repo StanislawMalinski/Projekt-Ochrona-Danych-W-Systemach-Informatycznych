@@ -2,7 +2,6 @@ import { sha256 } from "crypto-hash";
 import  secureLocalStorage  from  "react-secure-storage";
 import config from "../../clientconfig.json"
 import CryptoJS from "crypto-js";
-import * as base64 from 'base64-js';
 
 const iv_ = "0535627058893800";
 
@@ -13,15 +12,22 @@ async function hash(password: string) {
     return password;
 }
 
+async function hashPassword(password: string) {
+    hash(password).then((key) => {
+        return key.slice(0, 32);
+    });
+}
+
 async function getAesKey(password: string) {
     hash(password).then((key) => {
         return key.slice(0, 32);
     });
 }
 
-function saveCredentials(email: string, password: string) {
+async function saveCredentials(email: string, password: string, token: string) {
     secureLocalStorage.setItem("email", email);
-    secureLocalStorage.setItem("aesKey", getAesKey(password));
+    secureLocalStorage.setItem("aesKey", hashPassword(password));
+    secureLocalStorage.setItem("token", token); 
 }
 
 function getCredentials() {
@@ -36,44 +42,11 @@ function deleteCredentials() {
     secureLocalStorage.removeItem("aesKey");
 }
 
+function getToken(): any {
+    return JSON.parse(secureLocalStorage.getItem("token") as string);
+}
+
 function saveServerPubKey(key: string) {
-
-
-
-    function extractModulusExponent(xmlString: string): [bigint, bigint] | null {
-        const modulusMatch = xmlString.match(/<Modulus>(.*?)<\/Modulus>/);
-        const exponentMatch = xmlString.match(/<Exponent>(.*?)<\/Exponent>/);
-    
-        if (modulusMatch && exponentMatch) {
-            const modulusBase64 = modulusMatch[1];
-            const exponentBase64 = exponentMatch[1];
-    
-            // Decode base64 values
-            const modulusBytes = base64.toByteArray(modulusBase64);
-            const exponentBytes = base64.toByteArray(exponentBase64);
-    
-            // Convert bytes to BigInt
-            const modulus = Buffer.from(modulusBytes).readBigInt64BE();
-            const exponent = Buffer.from(exponentBytes).readBigInt64BE();
-    
-            return [modulus, exponent];
-        } else {
-            return null;
-        }
-    }
-    
-    // Example usage:
-    const xmlString = "<RSAKeyValue><Modulus>1Ur...gS=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
-    const result = extractModulusExponent(xmlString);
-    
-    if (result) {
-        const [modulus, exponent] = result;
-        console.log(`Modulus: ${modulus}`);
-        console.log(`Exponent: ${exponent}`);
-    } else {
-        console.log("Modulus and Exponent not found in the given XML string.");
-    }
-
     secureLocalStorage.setItem("serverKey", key);
 }
 
@@ -108,5 +81,7 @@ export {
     deleteCredentials, 
     saveServerPubKey, 
     encryptWithServerPubKey,
-    aes
+    aes,
+    getToken,
+    hashPassword
     };

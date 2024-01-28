@@ -1,8 +1,10 @@
 using projekt.Db.Repository;
+using projekt.Db.Repository.Interfaces;
 using projekt.Models.Dtos;
 using projekt.Models.Enums;
+using projekt.Services.Interfaces;
 
-namespace projekt.Serivces;
+namespace projekt.Services;
 
 public class DebugService : IDebugSerivce
 {
