@@ -2,7 +2,7 @@ using projekt.Models.Dtos;
 
 namespace projekt.Models.Responses
 {
-    public class AccountResponse : SimpleResponse
+    public class AccountResponse : BasicResponse
     {
         public AccountResponse()
         {
@@ -22,9 +22,9 @@ namespace projekt.Models.Responses
             Success = false;
             Token = new Token();
         }
-        public required string AccountNumber { get; set; }
-        public required decimal Balance { get; set; }
-        public required List<Transfer>  History {get; set; }
+        public string AccountNumber { get; set; }
+        public decimal Balance { get; set; }
+        public List<Transfer>  History {get; set; }
         public Token Token { get; set; }
     }
 }

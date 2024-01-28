@@ -1,10 +1,10 @@
-using projekt.Serivces;
+using projekt.Services;
 using projekt.Models.Dtos;
 
 namespace projekt.Models.Requests
 {
 
-    public class TransferRequest
+    public class TransferRequest : BasicRequest
     {
         public TransferRequest()
         {
@@ -21,13 +21,14 @@ namespace projekt.Models.Requests
         public required decimal Value { get; set; }
         public required string Title { get; set; }
         public required Token Token { get; set; }
-        public bool IsValid()
+        public override string IsValid()
         {
-            return  Validator.validNumber(AccountNumber) && 
-                    Validator.validNumber(RecipientAccountNumber) && 
-                    Validator.validName(Recipient) && 
-                    Validator.validText(Title) && 
-                    Value > 0;
+            if(!Validator.validNumber(AccountNumber)) return "Account number is not valid";
+            if(!Validator.validNumber(RecipientAccountNumber)) return "Recipient account number is not valid";
+            if(!Validator.validName(Recipient)) return "Recipient name is not valid";
+            if(!Validator.validText(Title)) return "Title is not valid";
+            if( Value <= 0) return "Value is not valid";
+            return "";
         }
     }
 }

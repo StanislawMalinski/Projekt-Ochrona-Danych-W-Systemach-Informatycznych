@@ -1,8 +1,8 @@
-using  projekt.Serivces;
+using  projekt.Services;
 using projekt.Models.Dtos;
 namespace projekt.Models.Requests
 {
-    public class LoginRequest
+    public class LoginRequest :BasicRequest
     {
         public LoginRequest()
         {
@@ -11,9 +11,11 @@ namespace projekt.Models.Requests
         }
         public required string Email { get; set; }
         public required string Password { get; set; }
-        public bool IsValid()
+        public override string IsValid()
         {
-            return Validator.validEmail(Email);
+            if (!Validator.validEmail(Email) ) 
+                return "Email is not valid";
+            return "";
         }
     }
 }

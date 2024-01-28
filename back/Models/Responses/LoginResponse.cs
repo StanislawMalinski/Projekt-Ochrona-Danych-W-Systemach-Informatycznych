@@ -1,7 +1,7 @@
 
 namespace projekt.Models.Responses
 {
-    public class LoginResponse : SimpleResponse
+    public class LoginResponse : BasicResponse
     {
         public LoginResponse()
         {

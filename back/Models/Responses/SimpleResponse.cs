@@ -2,9 +2,9 @@
 
 namespace projekt.Models.Responses
 {
-    public class SimpleResponse
+    public class BasicResponse
     {
-        public SimpleResponse()
+        public BasicResponse()
         {
             Success = false;
             Message = "";
