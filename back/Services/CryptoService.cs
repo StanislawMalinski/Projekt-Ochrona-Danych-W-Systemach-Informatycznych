@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using projekt.Models.Dtos;
 
-namespace projekt.Serivces
+namespace projekt.Services
 {
     public class CryptoService
     {
