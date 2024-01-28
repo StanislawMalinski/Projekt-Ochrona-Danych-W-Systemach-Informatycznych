@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using projekt.Models.Requests;
-using projekt.Serivces;
+using projekt.Services.Interfaces;
 using projekt.Models.Enums;
-
-using System.Text.Json;
-using System.Linq;
 using projekt.Models.Dtos;
+using projekt.Models.Responses;
+using projekt.Services.Interfaces;
 
 namespace projekt.Controllers;
 
@@ -15,173 +14,136 @@ public class BankController : ControllerBase
 {
     private readonly IBankService _bankService;
     private readonly IActivityService _activityService;
+    private readonly IAccessService _accessService;
+    private readonly IConfiguration _configuration;
 
-    public BankController(IBankService bankService, IActivityService activityService)
+    public BankController(IBankService bankService, IActivityService activityService, IAccessService accessService, IConfiguration configuration)
     {
         _bankService = bankService;
         _activityService = activityService;
+        _accessService = accessService;
+        _configuration = configuration;
     }
 
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request)
     {
-        Thread.Sleep(100);
-        var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (!request.IsValid())
-            return BadRequest("Email or password cannot be empty");
-        try {
-            var response = _bankService.Login(request);
-            _activityService.LogActivity(ActivityType.Login, request.Email, origin, response.Success);
-            return Ok(response);
-        } catch (Exception e) {
-            _activityService.LogActivity(ActivityType.Login, request.Email, origin,false);
-            return BadRequest();
-        }
+        delay();
+        var origin = getOrigin();
+        var response = validateRequest(request, origin);
+        response = response.Success ? _bankService.Login(request) : response;
+        _activityService.LogActivity(ActivityType.Login, request.Email, origin, response.Success);
+        return getResponse(response);
     }
+
+
 
     [HttpPost("register")]
     public IActionResult register([FromBody] RegisterRequest request)
     {
-        Thread.Sleep(100);
-        var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (!request.IsValid())
-            return BadRequest("Email or password cannot be empty");
-        try { 
-            var response = _bankService.Register(request);
-            _activityService.LogActivity(ActivityType.Register, request.Email,origin, response.Success);
-            return Ok(response);
-        } catch (Exception e) {
-            _activityService.LogActivity(ActivityType.Register, request.Email,origin, false);
-            return BadRequest();
-        }
+        delay();
+        var origin = getOrigin();
+        var response = validateRequest(request, origin);
+        response = response.Success ? _bankService.Register(request) : response;
+        _activityService.LogActivity(ActivityType.Register, request.Email,origin, response.Success);
+        return getResponse(response);
     } 
 
     [HttpPost("code-submit-register")]
     public IActionResult CodeSubmitRegister([FromBody] CodeSubmitRequest request)
     {
-        Thread.Sleep(100);
-        var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (!request.IsValid())
-            return BadRequest("Email or password cannot be empty");
-        try {
-            var response = _bankService.CodeSubmitRegister(request);
-            _activityService.LogActivity(ActivityType.CodeSubmit, request.Email,origin, response.Success);
-            return Ok(response);
-        } catch (Exception e) {
-            _activityService.LogActivity(ActivityType.CodeSubmit, request.Email,origin, false);
-            return BadRequest();
-        }
+        delay();
+        var origin = getOrigin();
+        var response = validateRequest(request, origin);
+        response = response.Success ? _bankService.CodeSubmitRegister(request) : response;
+        _activityService.LogActivity(ActivityType.CodeSubmit, request.Email,origin, response.Success);
+        return getResponse(response);
     }
 
     [HttpPost("pass-change-request-code")]
     public IActionResult PassChangeRequest([FromBody] PassChangeRequestCode request)
     {
-        Thread.Sleep(100);
-        var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (!request.IsValid())
-            return BadRequest("Email cannot be empty");
-        try {
-            var response = _bankService.ChangePasswordCodeRequest(request);
-            _activityService.LogActivity(ActivityType.ChangePasswordCodeRequest, request.Email,origin, response.Success);
-            return Ok(response);
-        } catch (Exception e) {
-            _activityService.LogActivity(ActivityType.ChangePasswordCodeRequest, request.Email,origin, false);
-            return BadRequest();
-        }
+        delay();
+        var origin = getOrigin();
+        var response = validateRequest(request, origin);
+        response = response.Success ? _bankService.ChangePasswordCodeRequest(request) : response;
+        _activityService.LogActivity(ActivityType.ChangePasswordCodeRequest, request.Email,origin, response.Success);
+        return getResponse(response);
     }
 
     [HttpPost("code-submit-pass-change")]
     public IActionResult CodeSubmit([FromBody] CodeSubmitRequest request)
     {
-        Thread.Sleep(100);
-        var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (!request.IsValid())
-            return BadRequest("Email or password cannot be empty");
-        try {
-            var response = _bankService.CodeSubmit(request);
-            _activityService.LogActivity(ActivityType.CodeSubmit, request.Email, origin,response.Success);
-            return Ok(response);
-        } catch (Exception e) {
-            _activityService.LogActivity(ActivityType.CodeSubmit, request.Email,origin, false);
-            return BadRequest();
-        }
+        delay();
+        var origin = getOrigin();
+        var response = validateRequest(request, origin);
+        response = response.Success ? _bankService.CodeSubmit(request) : response;
+        _activityService.LogActivity(ActivityType.CodeSubmit, request.Email, origin,response.Success);
+        return getResponse(response);
     }
 
     [HttpPost("pass-change")]
     public IActionResult PassChange([FromBody] PasswordChangeRequest request)
     {
-        Thread.Sleep(100);
-        var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (!request.IsValid())
-            return BadRequest("Email or password cannot be empty");
-        try {
-            var response = _bankService.ChangePassword(request);
-            _activityService.LogActivity(ActivityType.ChangePassword, request.Email,origin, response.Success);
-            return Ok(response);
-        } catch (Exception e) {
-            _activityService.LogActivity(ActivityType.ChangePassword, request.Email,origin, false);
-            return BadRequest();
-        }
+        delay();
+        var origin = getOrigin();
+        var response = validateRequest(request, origin);
+        response = response.Success ? _bankService.ChangePassword(request) : response;
+        _activityService.LogActivity(ActivityType.ChangePassword, request.Email,origin, response.Success);
+        return getResponse(response);
     }
 
     [HttpPost("transfer")]
     public IActionResult Transfer([FromBody] TransferRequest request)
     {
-        Thread.Sleep(100);
-        var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (!request.Token.isValid() || request.Token.AccountNumber != request.AccountNumber)
-            return BadRequest("You made some errors");
-        
-        try{
-            var response = _bankService.NewTransfer(request);
-            _activityService.LogActivity(ActivityType.NewTransfer, request.RecipientAccountNumber, origin, response.Success);
-            _activityService.LogActivity(ActivityType.NewTransfer, request.AccountNumber, origin, response.Success);
-            return Ok(response);
-        } catch (Exception e) {
-            _activityService.LogActivity(ActivityType.NewTransfer, request.RecipientAccountNumber,origin,  false);
-            _activityService.LogActivity(ActivityType.NewTransfer, request.AccountNumber, origin, false);
-            return BadRequest();
-        }
+        delay();
+        var origin = getOrigin();
+        var response = validateRequest(request, origin, request.Token);
+        response = response.Success ? _bankService.NewTransfer(request) : response;
+        _activityService.LogActivity(ActivityType.NewTransfer, request.AccountNumber, origin, response.Success);
+        return getResponse(response);
     }
 
     [HttpPost("account")]
     public IActionResult Account([FromBody] AccountRequest request)
     {
-        Thread.Sleep(100);
-        var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (!request.IsValid())
-            return BadRequest("Email cannot be empty");
-        try{
-            var response = _bankService.GetAccount(request);
-            _activityService.LogActivity(ActivityType.GetAccount, request.Email, origin, response.Success);
-            return Ok(response);
-        } catch (Exception e) {
-            _activityService.LogActivity(ActivityType.GetAccount, request.Email, origin, false);
-            return BadRequest();
-        }
+        delay();
+        var origin = getOrigin();
+        var response = validateRequest(request, origin, request.token);
+        response = response.Success ? _bankService.GetAccount(request) : response;
+        _activityService.LogActivity(ActivityType.GetAccount, request.Email, origin, response.Success);
+        return getResponse(response);
     }
 
-    [HttpGet("pubkey")]
-    public IActionResult GetPublicKey()
-    {
-        _activityService.LogActivity(ActivityType.Login, true);
-        return Ok(CryptoService.GetPublicKey());
+    private void delay(){
+        var delay = _configuration.GetSection("ClassConfig:Delay").Get<int>();
+        if(delay > 0) Thread.Sleep(delay);
     }
 
-    [HttpGet("activities")]
-    public IActionResult GetActivities([FromQuery] string email)
+    private string getOrigin(){
+        return Request.Headers["Origin"].ToString() ?? "unknown";
+    }
+
+    private BasicResponse validateRequest(BasicRequest request, string origin, Token token){
+        var response = validateRequest(request, origin);
+        var tokenIsValid = _bankService.ValidateToken(token);
+        response.Success = response.Success && tokenIsValid;
+        if (!tokenIsValid) response.Message = "Authentication failed";
+        return response;
+    }
+
+    private BasicResponse validateRequest(BasicRequest request, string origin){
+        var validatorMessage = request.IsValid();
+        return new BasicResponse(){
+            Success = _accessService.ShouldReplay(origin) && string.IsNullOrEmpty(validatorMessage),
+            Message = validatorMessage
+        };
+    }
+
+    private IActionResult getResponse(BasicResponse response)
     {
-        Thread.Sleep(100);
-        var origin = Request.Headers["Origin"].ToString() ?? "unknown";
-        if (Validator.validEmail(email) == false)
-            return BadRequest("Invalid email");
-        try {
-            var response = _activityService.GetActivities(email);
-            _activityService.LogActivity(ActivityType.GetActivities, email, origin, true);
-            return Ok(response);
-        } catch (Exception e) {
-            _activityService.LogActivity(ActivityType.GetActivities, email, origin, false);
-            return BadRequest();
-        }
+        if (response.Success) return Ok(response);
+        var basicResponse = new BasicResponse { Message = response.Message, Success = false };
+        return BadRequest(basicResponse);
     }
 }
