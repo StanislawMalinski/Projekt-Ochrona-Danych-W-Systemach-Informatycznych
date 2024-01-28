@@ -1,12 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
-using projekt.Serivces;
+using projekt.Services.Interfaces;
+using projekt.Services;
 using projekt.Models.Dtos;
+using projekt.Models.Enums;
+
 public class DebugController : ControllerBase
 {
     private readonly IDebugSerivce _debugService;
-    public DebugController(IDebugSerivce debugService)
+    private readonly IActivityService _activityService;
+
+    public DebugController(IDebugSerivce debugService, IActivityService activityService)
     {
         _debugService = debugService;
+        _activityService = activityService;
     }
 
     //[HttpPost("seed-db")]
@@ -27,5 +33,21 @@ public class DebugController : ControllerBase
     public IActionResult VerifyToken([FromBody] Token token)
     {
         return Ok(CryptoService.verifyToken(token));
+    }
+
+    [HttpGet("activities")]
+    public IActionResult GetActivities([FromQuery] string email)
+    {
+        var origin = Request.Headers["Origin"].ToString() ?? "unknown";
+        if (Validator.validEmail(email) == false)
+            return BadRequest("Invalid email");
+        try {
+            var response = _activityService.GetActivities(email);
+            _activityService.LogActivity(ActivityType.GetActivities, email, origin, true);
+            return Ok(response);
+        } catch (Exception e) {
+            _activityService.LogActivity(ActivityType.GetActivities, email, origin, false);
+            return BadRequest();
+        }
     }
 }
