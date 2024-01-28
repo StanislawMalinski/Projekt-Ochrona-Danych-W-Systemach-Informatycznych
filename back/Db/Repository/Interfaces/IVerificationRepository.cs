@@ -1,6 +1,6 @@
 using projekt.Models.Dtos;
 
-namespace projekt.Serivces;
+namespace projekt.Services;
 public interface IVerificationRepository
 {
     public Verification? GetVerification(string email);

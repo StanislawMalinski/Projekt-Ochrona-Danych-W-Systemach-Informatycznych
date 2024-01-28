@@ -6,5 +6,6 @@ namespace projekt.Db.Repository
     {
         public Activity LogActivity(Activity activity);
         public List<Activity> GetActivities(string email);
+        public int GetAcitivityCountForLastNMinutes(string origin, int minutes);
     }
 }

@@ -1,6 +1,6 @@
 using projekt.Db.BankContext;
 using projekt.Models.Dtos;
-using projekt.Serivces;
+using projekt.Services;
 
 namespace projekt.Db.Repository
 {
