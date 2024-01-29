@@ -80,7 +80,7 @@ public class AccountRepository : IAccountRepository
         return true;
     }
 
-    public bool validUser(LoginRequest request){
+    public bool ValidUser(LoginRequest request){
         var email = _cryptoService.EncryptString(request.Email);
         var account = _bankDbContext.Accounts
             .FirstOrDefault(x => x.Email == email && x.IsVerified);
@@ -124,7 +124,7 @@ public class AccountRepository : IAccountRepository
         return "" + (int.Parse(last_nr) + 1);
     }
 
-    public bool isTransferPossible(string accountNumber, decimal value){
+    public bool IsTransferPossible(string accountNumber, decimal value){
         accountNumber = _cryptoService.EncryptString(accountNumber);
         var account = _bankDbContext.Accounts
             .FirstOrDefault(x => x.AccountNumber == accountNumber);
@@ -133,7 +133,7 @@ public class AccountRepository : IAccountRepository
         return account.Balance >= value;
     }
 
-    public bool makeTransfer(Transfer transfer){
+    public bool MakeTransfer(Transfer transfer){
         var accountNumber = _cryptoService.EncryptString(transfer.AccountNumber);
         var recipientAccountNumber = _cryptoService.EncryptString(transfer.RecipentAccountNumber);
         var account = _bankDbContext.Accounts
@@ -182,5 +182,13 @@ public class AccountRepository : IAccountRepository
 
     private Account DecryptAccount(Account account){
         return _cryptoService.DecryptAccount(account);
+    }
+
+    public Account GetAccountByUserId(int userId)
+    {
+        var result = _bankDbContext.Accounts
+            .FirstOrDefault(x => x.Id == userId && x.IsVerified);
+        if (result == null) return new Account();
+        return DecryptAccount(result);
     }
 }

@@ -7,22 +7,19 @@ namespace projekt.Db.Repository;
 public class SessionRepository : ISessionRepository
 {
     private readonly BankDbContext _bankDbContext;
-    private readonly IConfiguration _configuration;
-    public SessionRepository(BankDbContext bankDbContext, IConfiguration configuration)
+    public SessionRepository(BankDbContext bankDbContext)
     {
         _bankDbContext = bankDbContext;
-        _configuration = configuration;
     }
 
-    public int CreateSession(int userId)
+    public int CreateSession(int userId, DateTime expirationDate)
     {
         CleanUp();
-        var maxSessions = _configuration.GetValue<int>("ClassConfig:SessionService:SessionDurtionInMinutes");
         Session session = new Session
         {
             SessionId = GenerateSessionId(),
             StartTime = DateTime.Now,
-            EndTime = DateTime.Now.AddMinutes(maxSessions),
+            EndTime = expirationDate,
             UserId = userId
         };
         _bankDbContext.Sessions.Add(session);
@@ -39,6 +36,15 @@ public class SessionRepository : ISessionRepository
         if (session == null) return;
         _bankDbContext.Sessions.Remove(session);
         _bankDbContext.SaveChanges();
+    }
+
+    public int GetUserIdForSession(int sessionId)
+    {
+        CleanUp();
+        var session = _bankDbContext.Sessions
+            .Where(s => s.SessionId == sessionId)
+            .FirstOrDefault();
+        return session == null ? -1 : session.UserId;
     }
 
     public bool IsSessionValid(int sessionId, int userId)
