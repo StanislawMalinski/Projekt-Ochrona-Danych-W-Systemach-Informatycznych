@@ -6,11 +6,10 @@ namespace projekt.Db.Repository.Interfaces;
 public interface IAccountRepository
 {
     public bool ChangePassword(string email, string password);
-    public bool CheckIfAccountExistsByAccountNumber(string AccountNumber);
-    public bool CheckIfAccountExistsByEmail(string Email);
-    public bool CheckIfNotVerifiedAccountExistsByEmail(string Email);
+    public bool CheckIfAccountExistsByAccountNumber(string AccountNumber, bool verified = true);
+    public bool CheckIfAccountExistsByEmail(string Email, bool verified = true);
     public Account GetAccount(string accountNumber);
-    public Account GetAccountByEmail(string email);
+    public Account GetAccountByEmail(string email, bool verified = true);
     public Account GetAccountByUserId(int userId);
     public bool IsTransferPossible(string accountNumber, decimal value);
     public bool MakeTransfer(Transfer transfer);

@@ -15,9 +15,11 @@ public class SessionRepository : ISessionRepository
     public int CreateSession(int userId, DateTime expirationDate)
     {
         CleanUp();
+        var sessions = _bankDbContext.Sessions
+            .Where(s => s.UserId == userId);
+        _bankDbContext.Sessions.RemoveRange(sessions);
         Session session = new Session
         {
-            SessionId = GenerateSessionId(),
             StartTime = DateTime.Now,
             EndTime = expirationDate,
             UserId = userId
@@ -44,6 +46,7 @@ public class SessionRepository : ISessionRepository
         var session = _bankDbContext.Sessions
             .Where(s => s.SessionId == sessionId)
             .FirstOrDefault();
+        Console.WriteLine("For sessionId: " + sessionId + " found userId: " + (session?.UserId));
         return session == null ? -1 : session.UserId;
     }
 
@@ -53,8 +56,7 @@ public class SessionRepository : ISessionRepository
         var session = _bankDbContext.Sessions
             .Where(s => s.SessionId == sessionId && s.UserId == userId)
             .FirstOrDefault();
-        if (session == null) return false;
-        if (session.EndTime < DateTime.Now) return false;
+        if (session == null || session.EndTime < DateTime.Now) return false;
         return true;
     }
 
@@ -65,12 +67,5 @@ public class SessionRepository : ISessionRepository
             .ToList()
             .ForEach(s => _bankDbContext.Sessions.Remove(s));
         _bankDbContext.SaveChanges();
-    }
-
-    private int GenerateSessionId()
-    {
-        var maxId = _bankDbContext.Sessions
-            .Max(s => s.SessionId);
-        return maxId <= 0 ? (maxId + 1) : 1;
     }
 }

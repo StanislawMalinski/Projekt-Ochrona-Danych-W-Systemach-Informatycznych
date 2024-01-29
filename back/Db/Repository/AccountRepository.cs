@@ -2,6 +2,7 @@
 using projekt.Db.BankContext;
 using projekt.Models.Dtos;
 using projekt.Models.Requests;
+using projekt.Services;
 using projekt.Db.Repository.Interfaces;
 using projekt.Services.Interfaces;
 
@@ -18,26 +19,20 @@ public class AccountRepository : IAccountRepository
         _cryptoService = cryptoService;
     }
 
-    public Account GetAccountByEmail(string email){
-        email = _cryptoService.EncryptString(email);
-        var result = _bankDbContext.Accounts
-            .FirstOrDefault(x => x.Email == email && x.IsVerified);
-        if (result == null) return new Account();
-        return DecryptAccount(result);
+    public Account GetAccountByEmail(string email, bool verified = true){
+        var result = _bankDbContext.Accounts.FirstOrDefault(x => x.Email == email && x.IsVerified == verified);
+        return result;
     }
 
     public Account GetAccount(string accountNumber){
-        accountNumber = _cryptoService.EncryptString(accountNumber);
-        var result = _bankDbContext.Accounts
-            .FirstOrDefault(x => x.AccountNumber == accountNumber && x.IsVerified);
-        if (result == null) return new Account();
-        return DecryptAccount(result);
+        var result = _bankDbContext.Accounts.FirstOrDefault(x => x.AccountNumber == accountNumber && x.IsVerified);
+        return result;
     }
 
     public Account Register(RegisterRequest request){
-        CleanUp();
+        cleanUp();
         var salt = _cryptoService.GenerateSalt();
-        var account = new Account{
+        _bankDbContext.Accounts.Add(new Account{
             AccountNumber = GenerateAccountNumber(),
             Name = request.Name,
             Email = request.Email,
@@ -45,150 +40,124 @@ public class AccountRepository : IAccountRepository
             Password = _cryptoService.HashPassword( request.Password,salt),
             Salt = salt,
             IsVerified = false
-        };
-        EncryptAccount(account);
-        _bankDbContext.Accounts.Add(account);
+        });
         _bankDbContext.SaveChanges();
-        var email = _cryptoService.EncryptString(request.Email);
-        account = _bankDbContext.Accounts
-            .FirstOrDefault(x => x.Email == email);
-        if (account == null) return new Account();
-        return DecryptAccount(account);
+        var account = _bankDbContext.Accounts.FirstOrDefault(x => x.Email == request.Email);
+        return account;
     }
 
     public Account Register(Account account){
-        CleanUp();
+        cleanUp();
         account.AccountNumber = GenerateAccountNumber();
         account.Salt = _cryptoService.GenerateSalt();
         account.Password = _cryptoService.HashPassword(account.Password, account.Salt);
         account.IsVerified = false;
-        EncryptAccount(account);
         _bankDbContext.Accounts.Add(account);
         _bankDbContext.SaveChanges();
-        return _cryptoService.DecryptAccount(account);
+        return account;
     }
 
     public bool VerifyAccount(string email){
-        email = _cryptoService.EncryptString(email);
-        var account = _bankDbContext.Accounts
-            .FirstOrDefault(x => x.Email == email && !x.IsVerified);
-        if (account == null) return false;
-        account.IsVerified = true;
-        EncryptAccount(account);
-        _bankDbContext.SaveChanges();
-        CleanUp();
-        return true;
+        try{
+            var account = _bankDbContext.Accounts.FirstOrDefault(x => x.Email == email && !x.IsVerified);
+            if (account == null) return false;
+            account.IsVerified = true;
+            _bankDbContext.SaveChanges();
+            cleanUp();
+            return true;
+        } catch(Exception e){
+            return false;
+        }
     }
 
     public bool ValidUser(LoginRequest request){
-        var email = _cryptoService.EncryptString(request.Email);
-        var account = _bankDbContext.Accounts
-            .FirstOrDefault(x => x.Email == email && x.IsVerified);
-        if (account == null) return false;
-        var salt = _cryptoService.DecryptString(account.Salt);
-        var password = _cryptoService.HashPassword(request.Password, salt);
-        CleanUp();
-        return password == account.Password;
+        try{
+            var account = _bankDbContext.Accounts.FirstOrDefault(x => x.Email == request.Email && x.IsVerified);
+            if (account == null) return false;
+            var salt = account.Salt;
+            var password = _cryptoService.HashPassword(request.Password, salt);
+            cleanUp();
+            return password == account.Password;
+        }catch(Exception e){
+            return false;
+        }
     }
 
-    public bool CheckIfAccountExistsByEmail(string email){
-        var encryptedEmail = _cryptoService.EncryptString(email);
-        var result = _bankDbContext.Accounts
-            .FirstOrDefault(x => x.Email == email && x.IsVerified);
-        CleanUp();
+    public bool CheckIfAccountExistsByEmail(string Email, bool verified = true){
+        try{
+            var result = _bankDbContext.Accounts.FirstOrDefault(x => x.Email == Email && x.IsVerified == verified);
+            cleanUp();
+            return result != null;
+        } catch(Exception e){
+            return false;
+        }
+    }
+
+    public bool CheckIfAccountExistsByAccountNumber(string AccountNumber, bool verified = true){
+        var result = _bankDbContext.Accounts.FirstOrDefault(x => x.AccountNumber == AccountNumber && x.IsVerified == verified);
+        cleanUp();
         return result != null;
-    }
-
-    public bool CheckIfAccountExistsByAccountNumber(string accountNumber){
-        var encryptedAccountNumber = _cryptoService.EncryptString(accountNumber);
-        var result = _bankDbContext.Accounts
-            .FirstOrDefault(x => x.AccountNumber == accountNumber && x.IsVerified);
-        CleanUp();
-        return result != null;
-    }
-
-    public bool CheckIfNotVerifiedAccountExistsByEmail(string email)
-    {
-        var encryptedEmail = _cryptoService.EncryptString(email);
-        var account = _bankDbContext.Accounts
-            .FirstOrDefault(x => x.Email == encryptedEmail && !x.IsVerified);
-        return account != null;
     }
 
     private string GenerateAccountNumber(){
-        var last_nr = _bankDbContext.Accounts
-            .Select(x => DecryptAccount(x))
-            .Max(x => x.AccountNumber);
+        var last_nr = _bankDbContext.Accounts.Max(x => x.AccountNumber);
         if (last_nr == null) return "567843560";
-        CleanUp();
+        cleanUp();
         return "" + (int.Parse(last_nr) + 1);
     }
 
     public bool IsTransferPossible(string accountNumber, decimal value){
-        accountNumber = _cryptoService.EncryptString(accountNumber);
-        var account = _bankDbContext.Accounts
-            .FirstOrDefault(x => x.AccountNumber == accountNumber);
+        var account = _bankDbContext.Accounts.FirstOrDefault(x => x.AccountNumber == accountNumber);
         if (account == null) return false;
-        CleanUp();
+        cleanUp();
         return account.Balance >= value;
     }
 
     public bool MakeTransfer(Transfer transfer){
-        var accountNumber = _cryptoService.EncryptString(transfer.AccountNumber);
-        var recipientAccountNumber = _cryptoService.EncryptString(transfer.RecipentAccountNumber);
-        var account = _bankDbContext.Accounts
-            .FirstOrDefault(x => x.AccountNumber == accountNumber);
-        var recipient = _bankDbContext.Accounts
-            .FirstOrDefault(x => x.AccountNumber == recipientAccountNumber);
-        if (account == null) return false;
-        if (recipient == null) return false;
-        account.Balance -= transfer.Value;
-        recipient.Balance += transfer.Value;
-        _bankDbContext.SaveChanges();
-        CleanUp();
-        return true;
+        try {
+            var account = _bankDbContext.Accounts.FirstOrDefault(x => x.AccountNumber == transfer.AccountNumber);
+            account.Balance -= transfer.Value;
+            var recipient = _bankDbContext.Accounts.FirstOrDefault(x => x.AccountNumber == transfer.RecipentAccountNumber);
+            recipient.Balance += transfer.Value;
+            _bankDbContext.SaveChanges();
+            cleanUp();
+            return true;
+        } catch(Exception e){
+            return false;
+        }
     }
 
     public bool ChangePassword(string email, string password)
     {
-        email = _cryptoService.EncryptString(email);
-        var account = _bankDbContext.Accounts
-            .FirstOrDefault(x => x.Email == email && x.IsVerified);
-        if (account == null) return false;
-        DecryptAccount(account);
-        account.Password = _cryptoService.HashPassword(password, account.Salt);
-        EncryptAccount(account);
-        _bankDbContext.SaveChanges();
-        CleanUp();
-        return true;
+        try{
+            var account = _bankDbContext.Accounts.FirstOrDefault(x => x.Email == email && x.IsVerified);
+            if (account == null) return false;
+            account.Password = _cryptoService.HashPassword(password, account.Salt);
+            _bankDbContext.SaveChanges();
+            cleanUp();
+            return true;
+        } catch(Exception e){
+            return false;
+        }
     }
 
-    private void CleanUp(){
+    private void cleanUp(){
         var accounts = _bankDbContext.Accounts
             .Where(x => !x.IsVerified)
-            .Select(x => DecryptAccount(x))
-            .Join(_bankDbContext.Verifications,  x => x.Email, y => y.Email, (x, y) => new {x, y})
+            .Join(_bankDbContext.Verifications, 
+                  x => x.Id, 
+                  y => y.UserId, 
+                  (x, y) => new {x, y})
             .Where(x => x.y.Date < DateTime.Now.AddMinutes(-5))
             .Select(x => x.x)
             .ToList();
-        _bankDbContext.Accounts
-            .RemoveRange(accounts);
+        _bankDbContext.Accounts.RemoveRange(accounts);
         _bankDbContext.SaveChanges();
-    }
-
-    private Account EncryptAccount(Account account){
-        return _cryptoService.EncryptAccount(account);
-    }
-
-    private Account DecryptAccount(Account account){
-        return _cryptoService.DecryptAccount(account);
     }
 
     public Account GetAccountByUserId(int userId)
     {
-        var result = _bankDbContext.Accounts
-            .FirstOrDefault(x => x.Id == userId && x.IsVerified);
-        if (result == null) return new Account();
-        return DecryptAccount(result);
+        var result = _bankDbContext.Accounts.FirstOrDefault(x => x.Id == userId);
+        return result;
     }
 }

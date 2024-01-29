@@ -19,7 +19,6 @@ namespace projekt.Db.Repository
         public Activity LogActivity(Activity activity)
         {
             cleanUp();
-            activity.Id = GenerateId();
              _bankDbContext.Activities.Add(activity);
              _bankDbContext.SaveChanges();
             return activity;
@@ -49,12 +48,6 @@ namespace projekt.Db.Repository
                 .ToList()
                 .ForEach(a => _bankDbContext.Activities.Remove(a));
             _bankDbContext.SaveChanges();
-        }
-
-        private int GenerateId(){
-            var maxId = _bankDbContext.Activities
-                .Max(a => a.Id);
-            return (int)(maxId != null ? maxId + 1 : 1);
         }
     }
 }
