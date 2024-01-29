@@ -19,13 +19,19 @@ public class DebugController : ControllerBase
         _activityService = activityService;
     }
 
-    //[HttpPost("seed-db")]
+    [HttpPost("seed-db")]
     public IActionResult SeedDb()
     {
         _debugService.SeedDatabase();
         return Ok();
     }
 
+    [HttpPost("clean-db")]
+    public IActionResult CleanDb()
+    {
+        _debugService.CleanDatabase();
+        return Ok();
+    }
 
     [HttpGet("token")]
     public IActionResult GetToken([FromQuery] string accountNumber)

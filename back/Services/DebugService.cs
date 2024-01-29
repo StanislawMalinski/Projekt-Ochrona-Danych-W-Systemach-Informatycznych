@@ -1,3 +1,4 @@
+using projekt.Db.BankContext;
 using projekt.Db.Repository;
 using projekt.Db.Repository.Interfaces;
 using projekt.Models.Dtos;
@@ -11,10 +12,12 @@ public class DebugService : IDebugSerivce
     private readonly IActivityRepository _activityRepository;
     private readonly IAccountRepository _accountRepository;
     private readonly ITransferRepository _transferRepository;
+    private readonly BankDbContext _bankDbContext;
     private readonly Random _random;
 
-    public DebugService(IActivityRepository activityRepository, IAccountRepository accountRepository, ITransferRepository transferRepository)
+    public DebugService(IActivityRepository activityRepository, IAccountRepository accountRepository, ITransferRepository transferRepository, BankDbContext bankDbContext)
     {
+        _bankDbContext = bankDbContext;
         _accountRepository = accountRepository;
         _activityRepository = activityRepository;
         _transferRepository = transferRepository;
@@ -25,7 +28,7 @@ public class DebugService : IDebugSerivce
     {
         if (!activity.Success ||
             activity.Origin != "") 
-            Console.WriteLine(activityToLog(activity));
+        Console.WriteLine(activityToLog(activity));
         
     }
 
@@ -40,6 +43,14 @@ public class DebugService : IDebugSerivce
 
     private string messageToLog(string recipient, string message){
         return $"[{DateTime.Now}] Type: Message |Recipient: {recipient} |Content: {message} |";
+    }
+    public void CleanDatabase()
+    {
+        _bankDbContext.Accounts.RemoveRange(_bankDbContext.Accounts);
+        _bankDbContext.Transfers.RemoveRange(_bankDbContext.Transfers);
+        _bankDbContext.Activities.RemoveRange(_bankDbContext.Activities);
+        _bankDbContext.Verifications.RemoveRange(_bankDbContext.Verifications);
+        _bankDbContext.SaveChanges();
     }
 
     public void SeedDatabase()
@@ -66,6 +77,7 @@ public class DebugService : IDebugSerivce
                Type = ActivityType.Register
            });
         }
+
         foreach (Account account1 in accounts)
         {
             for (int i = 0; i < 10; i++)
