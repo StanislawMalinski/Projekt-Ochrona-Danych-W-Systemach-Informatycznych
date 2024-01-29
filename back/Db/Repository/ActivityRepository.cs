@@ -19,6 +19,7 @@ namespace projekt.Db.Repository
         public Activity LogActivity(Activity activity)
         {
             cleanUp();
+            activity.Id = GenerateId();
              _bankDbContext.Activities.Add(activity);
              _bankDbContext.SaveChanges();
             return activity;
@@ -35,10 +36,11 @@ namespace projekt.Db.Repository
         public int GetAcitivityCountForLastNMinutes(string origin, int minutes)
         {
             cleanUp();
-            return _bankDbContext.Activities
-                .Where(a => a.AssociatedEmail == origin)
-                .Where(a => a.Date >= DateTime.Now.AddMinutes(-minutes))
+            var date = DateTime.Now.AddMinutes(-1 * minutes);
+            var count = _bankDbContext.Activities
+                .Where(a => a.Origin == origin && a.Date > date)
                 .Count();
+            return count;
         }
 
         private void cleanUp(){
@@ -47,6 +49,12 @@ namespace projekt.Db.Repository
                 .ToList()
                 .ForEach(a => _bankDbContext.Activities.Remove(a));
             _bankDbContext.SaveChanges();
+        }
+
+        private int GenerateId(){
+            var maxId = _bankDbContext.Activities
+                .Max(a => a.Id);
+            return (int)(maxId != null ? maxId + 1 : 1);
         }
     }
 }

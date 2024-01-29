@@ -20,9 +20,10 @@ public class AccessService : IAccessService
     public bool ShouldReplay(string origin)
     {   
         if(_timeoutsRepository.isTimeOut(origin)) return false;
-        var timeOutInMinutes = _configuration.GetValue<int>("AccessService:TimeOutInMinutes");
-        var allowedCount = _configuration.GetValue<int>("AccessService:AllowedCount");
-        var count = _activityRepository.GetAcitivityCountForLastNMinutes(origin, timeOutInMinutes);
+        var allowedTimeSpanInMinutes = _configuration.GetValue<int>("ClassConfig:AccessService:AllowedTimeSpanInMinutes");
+        var timeOutInMinutes = _configuration.GetValue<int>("ClassConfig:AccessService:TimeOutInMinutes");
+        var allowedCount = _configuration.GetValue<int>("ClassConfig:AccessService:AllowedCount");
+        var count = _activityRepository.GetAcitivityCountForLastNMinutes(origin, allowedTimeSpanInMinutes);
         if(count > allowedCount) _timeoutsRepository.setTimeOut(origin, timeOutInMinutes);
         return count <= allowedCount;
     }

@@ -38,13 +38,6 @@ namespace projekt.Services
             }
         }
 
-        public string Encrypt(string text)
-        {
-            var data = Encoding.UTF8.GetBytes(text);
-            var cipher = rsa.Encrypt(data, false);
-            return Convert.ToBase64String(cipher);
-        }
-
         public Token GenerateToken(string accountNumber)
         {
             var data = Encoding.UTF8.GetBytes(accountNumber);
@@ -150,6 +143,16 @@ namespace projekt.Services
             account.Password = DecryptDbEntry(account.Password);
             account.Salt = DecryptDbEntry(account.Salt);
             return account;
+        }
+
+        public string EncryptString(string plainText)
+        {
+            return Convert.ToBase64String(EncryptStringToBytes_Aes(plainText, _key, _iv));
+        }
+
+        public string DecryptString(string cipherText)
+        {
+            return DecryptStringFromBytes_Aes(Convert.FromBase64String(cipherText), _key, _iv);
         }
     }
 }
