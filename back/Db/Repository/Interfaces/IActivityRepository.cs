@@ -1,11 +1,13 @@
 
 using projekt.Models.Dtos;
+using System.Collections.Generic;
+
 namespace projekt.Db.Repository
 {
     public interface IActivityRepository
     {
-        public Activity LogActivity(Activity activity);
-        public List<Activity> GetActivities(string email);
         public int GetAcitivityCountForLastNMinutes(string origin, int minutes);
+        public List<Activity> GetActivities(string email);
+        public Activity LogActivity(Activity activity);
     }
 }
