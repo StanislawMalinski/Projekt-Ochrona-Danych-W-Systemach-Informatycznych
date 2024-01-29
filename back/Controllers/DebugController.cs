@@ -7,11 +7,15 @@ using projekt.Models.Enums;
 public class DebugController : ControllerBase
 {
     private readonly IDebugSerivce _debugService;
+    private readonly ICryptoService _cryptoService;
     private readonly IActivityService _activityService;
 
-    public DebugController(IDebugSerivce debugService, IActivityService activityService)
+    public DebugController(IDebugSerivce debugService, 
+        ICryptoService cryptoService,
+        IActivityService activityService)
     {
         _debugService = debugService;
+        _cryptoService = cryptoService;
         _activityService = activityService;
     }
 
@@ -26,13 +30,13 @@ public class DebugController : ControllerBase
     [HttpGet("token")]
     public IActionResult GetToken([FromQuery] string accountNumber)
     {
-        return Ok(CryptoService.GenerateToken(accountNumber));
+        return Ok(_cryptoService.GenerateToken(accountNumber));
     }
 
     [HttpPost("vtoken")]
     public IActionResult VerifyToken([FromBody] Token token)
     {
-        return Ok(CryptoService.verifyToken(token));
+        return Ok(_cryptoService.verifyToken(token));
     }
 
     [HttpGet("activities")]

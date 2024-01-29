@@ -14,18 +14,21 @@ public class BankService : IBankService
     private readonly ITransferRepository _transferRepository;
     private readonly IVerificationRepository _verificationRepository;
     private readonly IDebugSerivce _debug_service;
+    private readonly ICryptoService _cryptoSerivce;
     private readonly IConfiguration _congifuration;
 
     public BankService(IAccountRepository accountRepository, 
         ITransferRepository transferRepository, 
         IVerificationRepository verificationRepository, 
         IDebugSerivce debug_service,
+        ICryptoService cryptoSerivce,
         IConfiguration configuration)
     {
         _accountRepository = accountRepository;
         _transferRepository = transferRepository;
         _verificationRepository = verificationRepository;
         _debug_service = debug_service;
+        _cryptoSerivce = cryptoSerivce;
         _congifuration = configuration;
     }
 
@@ -42,13 +45,11 @@ public class BankService : IBankService
 
     public BasicResponse CodeSubmitRegister(CodeSubmitRequest request){
         var accountExists = _accountRepository.CheckIfNotVerifiedAccountExistsByEmail(request.Email);
-        if(!accountExists) { 
-            return new BasicResponse {Message = "Sorry, your validation code has expiered.",Success = false}; 
-        }
-        var verificationIsValid = _verificationRepository.CheckIfVerificationIsValid(request.Email, request.Code);
-        if(!verificationIsValid) { 
+        if(!accountExists) 
             return new BasicResponse {Message = "Sorry, your validation code has expiered.", Success = false}; 
-        }
+        var verificationIsValid = _verificationRepository.CheckIfVerificationIsValid(request.Email, request.Code);
+        if(!verificationIsValid)
+            return new BasicResponse {Message = "Sorry, your validation code has expiered.", Success = false}; 
         _accountRepository.VerifyAccount(request.Email);
         _verificationRepository.DeleteVerification(request.Email);
         return new BasicResponse {Message = "Account has been verified. Please try to login now...", Success = true};
@@ -82,7 +83,7 @@ public class BankService : IBankService
             History = _transferRepository.GetHistory(result.AccountNumber),
             Message = "Login successful.",
             Success = true,
-            Token = CryptoService.GenerateToken(result.AccountNumber)
+            Token = _cryptoSerivce.GenerateToken(result.AccountNumber)
         };
     }
 
@@ -125,7 +126,7 @@ public class BankService : IBankService
             History = _transferRepository.GetHistory(account.AccountNumber),
             Message = "Transfer was successful.",
             Success = true,
-            Token = CryptoService.GenerateToken(account.AccountNumber)
+            Token = _cryptoSerivce.GenerateToken(account.AccountNumber)
         };
     }
 
@@ -145,7 +146,7 @@ public class BankService : IBankService
         Random random = new Random();
         string verificationCode = "";
         var lenCode = _congifuration.GetValue<int>("BankService:VerificationCodeLength");
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < lenCode; i++)
         {
             verificationCode += random.Next(0, 9);
         }
@@ -183,8 +184,19 @@ public class BankService : IBankService
         return new BasicResponse {Message = "Password has been changed.",Success = true};
     }
 
-    public bool ValidateToken(Token token)
+    public bool ValidateToken(Token token, string EmailOrAccountNumber)
     {
-        return CryptoService.verifyToken(token);
+        var validToken = _cryptoSerivce.verifyToken(token);
+        validToken = validToken && (token.Expiration > DateTime.Now);
+        Account account = new Account();
+        if (Validator.validEmail(EmailOrAccountNumber))
+            account = _accountRepository.GetAccountByEmail(EmailOrAccountNumber);
+        else if (Validator.validNumber(EmailOrAccountNumber))
+            account = _accountRepository.GetAccount(EmailOrAccountNumber);
+        else
+            return false;
+        if (account == null) return false;
+        validToken = validToken && account.AccountNumber == token.AccountNumber;
+        return validToken;
     }
 }

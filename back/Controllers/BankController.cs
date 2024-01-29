@@ -98,7 +98,7 @@ public class BankController : ControllerBase
     {
         delay();
         var origin = getOrigin();
-        var response = validateRequest(request, origin, request.Token);
+        var response = validateRequest(request, origin, request.Token, request.AccountNumber);
         response = response.Success ? _bankService.NewTransfer(request) : response;
         _activityService.LogActivity(ActivityType.NewTransfer, request.AccountNumber, origin, response.Success);
         return getResponse(response);
@@ -109,7 +109,7 @@ public class BankController : ControllerBase
     {
         delay();
         var origin = getOrigin();
-        var response = validateRequest(request, origin, request.token);
+        var response = validateRequest(request, origin, request.token, request.Email);
         response = response.Success ? _bankService.GetAccount(request) : response;
         _activityService.LogActivity(ActivityType.GetAccount, request.Email, origin, response.Success);
         return getResponse(response);
@@ -124,9 +124,9 @@ public class BankController : ControllerBase
         return Request.Headers["Origin"].ToString() ?? "unknown";
     }
 
-    private BasicResponse validateRequest(BasicRequest request, string origin, Token token){
+    private BasicResponse validateRequest(BasicRequest request, string origin, Token token, string EmailOrAccountNumber){
         var response = validateRequest(request, origin);
-        var tokenIsValid = _bankService.ValidateToken(token);
+        var tokenIsValid = _bankService.ValidateToken(token, EmailOrAccountNumber);
         response.Success = response.Success && tokenIsValid;
         if (!tokenIsValid) response.Message = "Authentication failed";
         return response;

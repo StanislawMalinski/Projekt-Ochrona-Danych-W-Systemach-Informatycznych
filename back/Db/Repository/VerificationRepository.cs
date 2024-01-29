@@ -1,5 +1,6 @@
 using projekt.Db.BankContext;
 using projekt.Models.Dtos;
+using projekt.Services.Interfaces;
 using projekt.Services;
 
 namespace projekt.Db.Repository
@@ -7,10 +8,14 @@ namespace projekt.Db.Repository
     public class VerificationRepository : IVerificationRepository
     {
         private readonly BankDbContext _dbcontext;
-        public VerificationRepository(BankDbContext context)
+        private readonly ICryptoService _cryptoService;
+        public VerificationRepository(BankDbContext context, 
+            ICryptoService cryptoService)
         {
             _dbcontext = context;
+            _cryptoService = cryptoService;
         }
+
         public Verification? GetVerification(string email)
         {
             cleanup();
@@ -22,7 +27,7 @@ namespace projekt.Db.Repository
 
         public bool CheckIfVerificationIsValid(string email, string code)
         {
-            code = CryptoService.HashPassword(code, email);
+            code = _cryptoService.HashPassword(code, email);
             cleanup();
             return _dbcontext.Verifications
                 .Where(v => v.Email == email && v.Code == code)
@@ -38,7 +43,7 @@ namespace projekt.Db.Repository
             verification = new Verification
             {
                 Email = email,
-                Code = CryptoService.HashPassword(code, email),
+                Code = _cryptoService.HashPassword(code, email),
                 Date = System.DateTime.Now
             };
             _dbcontext.Verifications.Add(verification);
