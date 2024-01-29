@@ -8,6 +8,7 @@ public class DebugController : ControllerBase
 {
     private readonly IDebugSerivce _debugService;
     private readonly ICryptoService _cryptoService;
+
     private readonly IActivityService _activityService;
 
     public DebugController(IDebugSerivce debugService, 
@@ -34,15 +35,16 @@ public class DebugController : ControllerBase
     }
 
     [HttpGet("token")]
-    public IActionResult GetToken([FromQuery] string accountNumber)
+    public IActionResult GetToken([FromQuery] int usedId)
     {
-        return Ok(_cryptoService.GenerateToken(accountNumber));
+        DateTime date = DateTime.Now.AddDays(1);
+        return Ok(_cryptoService.GenerateToken(usedId, date));
     }
 
     [HttpPost("vtoken")]
     public IActionResult VerifyToken([FromBody] Token token)
     {
-        return Ok(_cryptoService.verifyToken(token));
+        return Ok(_cryptoService.VerifyToken(token));
     }
 
     [HttpGet("activities")]
