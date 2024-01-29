@@ -17,6 +17,7 @@ namespace Tests.Services
 
         private static string allowedOrigin = "http://example.com";
         private static int timeOutInMinutes = 5;
+        private static int lastNMinutes = 5;
         private static int allowedCount = 5;
 
 
@@ -26,8 +27,9 @@ namespace Tests.Services
             _timeoutsRepositoryMock = new Mock<ITimeOutRepository>();
             _activityRepositoryMock = new Mock<IActivityRepository>();
             var inMemorySettings = new Dictionary<string, string> {
-                {"AccessService:TimeOutInMinutes", "" + timeOutInMinutes},
-                {"AccessService:AllowedCount", "" + allowedCount},
+                {"ClassConfig:AccessService:AllowedTimeSpanInMinutes", "" + lastNMinutes},
+                {"ClassConfig:AccessService:TimeOutInMinutes", "" + timeOutInMinutes},
+                {"ClassConfig:AccessService:AllowedCount", "" + allowedCount},
             };
             _configurationMock = new ConfigurationBuilder()
                 .AddInMemoryCollection(inMemorySettings)
@@ -41,27 +43,41 @@ namespace Tests.Services
         }
 
         [Test]
-        public void ShouldReplay_ReturnsTrue_WhenOriginIsAllowed()
+        public void ShouldReplay_ReturnsTrue_WhenOriginIsAllowedAndCountNumberIsNotExcided()
         {
             // Arrange
-            _activityRepositoryMock.Setup(x => x.GetAcitivityCountForLastNMinutes(allowedOrigin, timeOutInMinutes)).Returns(4);
+            _activityRepositoryMock.Setup(x => x.GetAcitivityCountForLastNMinutes(allowedOrigin, lastNMinutes)).Returns(allowedCount - 1);
             // Act
             bool result = _accessService.ShouldReplay(allowedOrigin);
             // Assert
             Assert.IsTrue(result);
+            _timeoutsRepositoryMock.Verify(x => x.setTimeOut(allowedOrigin, timeOutInMinutes), Times.Never);
         }
 
 
         [Test]
-        public void ShouldReplay_ReturnsFals_WhenCountNumberIsExcided()
+        public void ShouldReplay_ReturnsFalse_WhenCountNumberIsExcided()
         {
             // Arrange
-            _activityRepositoryMock.Setup(x => x.GetAcitivityCountForLastNMinutes(allowedOrigin, timeOutInMinutes)).Returns(6);
+            _timeoutsRepositoryMock.Setup(x => x.isTimeOut(allowedOrigin)).Returns(false);
+            _activityRepositoryMock.Setup(x => x.GetAcitivityCountForLastNMinutes(allowedOrigin, lastNMinutes)).Returns(allowedCount + 2);
             // Act
             bool result = _accessService.ShouldReplay(allowedOrigin);
             // Assert
             Assert.IsFalse(result);
             _timeoutsRepositoryMock.Verify(x => x.setTimeOut(allowedOrigin, timeOutInMinutes), Times.Once);
+        }
+
+        [Test]
+        public void ShouldReplay_ReturnsFalse_WhenOriginIsTimedOut()
+        {
+            // Arrange
+            _timeoutsRepositoryMock.Setup(x => x.isTimeOut(allowedOrigin)).Returns(true);
+            // Act
+            bool result = _accessService.ShouldReplay(allowedOrigin);
+            // Assert
+            Assert.IsFalse(result);
+            _timeoutsRepositoryMock.Verify(x => x.setTimeOut(allowedOrigin, timeOutInMinutes), Times.Never);
         }
     }
 }

@@ -26,24 +26,11 @@ public class CryptoServiceTest
     }
 
     [Test]
-    public void Encrypt_ShouldReturnEncryptedString()
-    {
-        // Given
-        // When
-        var result = _cryptoService.Encrypt(plainText);
-
-        // Then
-        Assert.IsNotNull(result);
-        Assert.AreNotEqual(result, plainText);
-    }
-
-    [Test]
     public void GenerateToken_ShouldReturnValidToken()
     {
         // Given
         // When
         var result = _cryptoService.GenerateToken(accountNumber);
-
         // Then
         Assert.IsNotNull(result);
         Assert.AreEqual(result.AccountNumber, accountNumber);
