@@ -9,6 +9,7 @@ using projekt.Models.Dtos;
 
 namespace Tests.Services
 {
+    [TestFixture]
     public class AccessServiceTest
     {
         private Mock<ITimeOutRepository> _timeoutsRepositoryMock;

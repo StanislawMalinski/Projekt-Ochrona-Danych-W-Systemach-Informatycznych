@@ -70,7 +70,8 @@ public class BankService : IBankService
             Balance = result.Balance,
             History = _transferRepository.GetHistory(result.AccountNumber),
             Message = "Account found.",
-            Success = true
+            Success = true,
+            Token = request.Token
         };
     }
     public AccountResponse Login(LoginRequest request)

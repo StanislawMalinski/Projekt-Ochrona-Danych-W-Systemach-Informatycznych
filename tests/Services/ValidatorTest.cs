@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace tests.Services
 {
+    [TestFixture]
     public class ValidatorTest
     {
         private IConfiguration _configuration;

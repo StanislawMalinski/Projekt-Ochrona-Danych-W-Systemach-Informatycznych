@@ -2,6 +2,7 @@ using projekt.Services;
 using projekt.Services.Interfaces;
 
 namespace tests.Services;
+[TestFixture]
 public class CryptoServiceTest
 {
     private CryptoService _cryptoService;
@@ -10,6 +11,8 @@ public class CryptoServiceTest
     private static string password = "test123";
     private static string iv = "test123";
     private static string accountNumber = "123456789";
+    private static int userId = 1;
+    private static int sessionId = 1;
 
 
     [SetUp]
@@ -66,11 +69,10 @@ public class CryptoServiceTest
     public void GenerateToken_ShouldReturnValidToken()
     {
         // Given
-        int sessionId = 123;
         DateTime expirationDate = DateTime.Now.AddHours(1);
 
         // When
-        var result = _cryptoService.GenerateToken(sessionId, expirationDate);
+        var result = _cryptoService.GenerateToken(userId, sessionId, expirationDate);
 
         // Then
         Assert.IsNotNull(result);
@@ -83,9 +85,8 @@ public class CryptoServiceTest
     public void VerifyToken_ShouldReturnTrueForValidToken()
     {
         // Given
-        int sessionId = 123;
         DateTime expirationDate = DateTime.Now.AddHours(1);
-        var token = _cryptoService.GenerateToken(sessionId, expirationDate);
+        var token = _cryptoService.GenerateToken(userId, sessionId, expirationDate);
         // When
         var result = _cryptoService.VerifyToken(token);
         // Then
@@ -96,15 +97,12 @@ public class CryptoServiceTest
     public void GenerateToken_ShouldReturnDifferentSignsForDifferentInputs()
     {
         // Given
-        int sessionId1 = 123;
         DateTime expirationDate1 = DateTime.Now.AddHours(1);
-
-        int sessionId2 = 123;
         DateTime expirationDate2 = DateTime.Now.AddHours(1);
 
         // When
-        var result1 = _cryptoService.GenerateToken(sessionId1, expirationDate1);
-        var result2 = _cryptoService.GenerateToken(sessionId2, expirationDate2);
+        var result1 = _cryptoService.GenerateToken(userId, sessionId, expirationDate1);
+        var result2 = _cryptoService.GenerateToken(userId, sessionId, expirationDate2);
 
         // Then
         Assert.AreNotEqual(result1.Sign, result2.Sign);

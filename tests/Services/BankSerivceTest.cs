@@ -9,6 +9,7 @@ using projekt.Services;
 
 namespace Tests.Services
 {
+    [TestFixture]
     public class BankServiceTest
     {
         private Mock<IAccountRepository> _accountRepositoryMock;
@@ -17,7 +18,6 @@ namespace Tests.Services
         private Mock<IVerificationRepository> _verificationRepositoryMock;
         private Mock<IDebugSerivce> _debugServiceMock;
         private IConfiguration _configuration;
-        private Mock<ICryptoService> _cryptoServiceMock;
 
         private BankService _bankService;
 
@@ -57,7 +57,6 @@ namespace Tests.Services
             _accountRepositoryMock = new Mock<IAccountRepository>();
             _verificationRepositoryMock = new Mock<IVerificationRepository>();
             _debugServiceMock = new Mock<IDebugSerivce>();
-            _cryptoServiceMock = new Mock<ICryptoService>();
 
             var inMemorySettings = new Dictionary<string, string> {
                 {"key", "value"},
@@ -71,7 +70,6 @@ namespace Tests.Services
                 _transferRepositoryMock.Object,
                 _verificationRepositoryMock.Object,
                 _debugServiceMock.Object, 
-                _cryptoServiceMock.Object, 
                 _configuration);
         }
 
@@ -80,7 +78,7 @@ namespace Tests.Services
         {
             //Given
             _accountRepositoryMock.Setup(x => x.ValidUser(loginRequest)).Returns(true);
-            _accountRepositoryMock.Setup(x => x.GetAccountByEmail(loginRequest.Email)).Returns(account);
+            _accountRepositoryMock.Setup(x => x.GetAccountByEmail(loginRequest.Email, true)).Returns(account);
             _transferRepositoryMock.Setup(x => x.GetHistory(account.AccountNumber)).Returns(new List<Transfer>());
             //When
             var result = _bankService.Login(loginRequest);
