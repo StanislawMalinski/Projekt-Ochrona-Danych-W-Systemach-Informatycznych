@@ -2,7 +2,6 @@
 using projekt.Db.BankContext;
 using projekt.Models.Dtos;
 using projekt.Models.Requests;
-using projekt.Services;
 using projekt.Db.Repository.Interfaces;
 using projekt.Services.Interfaces;
 
@@ -36,7 +35,7 @@ public class AccountRepository : IAccountRepository
     }
 
     public Account Register(RegisterRequest request){
-        cleanUp();
+        CleanUp();
         var salt = _cryptoService.GenerateSalt();
         var account = new Account{
             AccountNumber = GenerateAccountNumber(),
@@ -58,7 +57,7 @@ public class AccountRepository : IAccountRepository
     }
 
     public Account Register(Account account){
-        cleanUp();
+        CleanUp();
         account.AccountNumber = GenerateAccountNumber();
         account.Salt = _cryptoService.GenerateSalt();
         account.Password = _cryptoService.HashPassword(account.Password, account.Salt);
@@ -77,7 +76,7 @@ public class AccountRepository : IAccountRepository
         account.IsVerified = true;
         EncryptAccount(account);
         _bankDbContext.SaveChanges();
-        cleanUp();
+        CleanUp();
         return true;
     }
 
@@ -88,7 +87,7 @@ public class AccountRepository : IAccountRepository
         if (account == null) return false;
         var salt = _cryptoService.DecryptString(account.Salt);
         var password = _cryptoService.HashPassword(request.Password, salt);
-        cleanUp();
+        CleanUp();
         return password == account.Password;
     }
 
@@ -96,16 +95,15 @@ public class AccountRepository : IAccountRepository
         var encryptedEmail = _cryptoService.EncryptString(email);
         var result = _bankDbContext.Accounts
             .FirstOrDefault(x => x.Email == email && x.IsVerified);
-        cleanUp();
+        CleanUp();
         return result != null;
     }
 
     public bool CheckIfAccountExistsByAccountNumber(string accountNumber){
         var encryptedAccountNumber = _cryptoService.EncryptString(accountNumber);
         var result = _bankDbContext.Accounts
-            .Select(x => DecryptAccount(x))
             .FirstOrDefault(x => x.AccountNumber == accountNumber && x.IsVerified);
-        cleanUp();
+        CleanUp();
         return result != null;
     }
 
@@ -122,7 +120,7 @@ public class AccountRepository : IAccountRepository
             .Select(x => DecryptAccount(x))
             .Max(x => x.AccountNumber);
         if (last_nr == null) return "567843560";
-        cleanUp();
+        CleanUp();
         return "" + (int.Parse(last_nr) + 1);
     }
 
@@ -131,7 +129,7 @@ public class AccountRepository : IAccountRepository
         var account = _bankDbContext.Accounts
             .FirstOrDefault(x => x.AccountNumber == accountNumber);
         if (account == null) return false;
-        cleanUp();
+        CleanUp();
         return account.Balance >= value;
     }
 
@@ -147,7 +145,7 @@ public class AccountRepository : IAccountRepository
         account.Balance -= transfer.Value;
         recipient.Balance += transfer.Value;
         _bankDbContext.SaveChanges();
-        cleanUp();
+        CleanUp();
         return true;
     }
 
@@ -161,14 +159,14 @@ public class AccountRepository : IAccountRepository
         account.Password = _cryptoService.HashPassword(password, account.Salt);
         EncryptAccount(account);
         _bankDbContext.SaveChanges();
-        cleanUp();
+        CleanUp();
         return true;
     }
 
-    private void cleanUp(){
+    private void CleanUp(){
         var accounts = _bankDbContext.Accounts
-            .Select(x => DecryptAccount(x))
             .Where(x => !x.IsVerified)
+            .Select(x => DecryptAccount(x))
             .Join(_bankDbContext.Verifications,  x => x.Email, y => y.Email, (x, y) => new {x, y})
             .Where(x => x.y.Date < DateTime.Now.AddMinutes(-5))
             .Select(x => x.x)

@@ -29,20 +29,22 @@ namespace projekt.Services
             return valid;
         }
 
-        public static  bool validName(string name)
+        public static bool validName(string name)
         {
             bool valid = true;
             foreach (var c in name)
-                if (!char.IsLetter(c) || c == ' ' || c == '-')
+                if (!char.IsLetter(c) && c != ' ' && c != '-')
                     valid = false;
             return valid;
         }
 
-        public static  bool validNumber(string number)
+        public static bool validNumber(string number)
         {
             bool valid = true;
             foreach (var c in number)
-                if (!char.IsDigit(c) || c == '.' || c == ',')
+                if (!char.IsDigit(c) &&
+                         c != '.' && 
+                         c != ',')
                     valid = false;
             return valid;
         }
@@ -51,7 +53,15 @@ namespace projekt.Services
         {
             bool valid = true;
             foreach (var c in text)
-                if (char.IsLetterOrDigit(c) || c == ' ' || c == '-' || c == '.' || c == ',')
+                if (!char.IsLetterOrDigit(c) &&
+                    !char.IsWhiteSpace(c) &&
+                        c != '-' &&
+                        c != '.' &&
+                        c != ',' &&
+                        c != '!' &&
+                        c != '?' &&
+                        c != ':' &&
+                        c != ';')
                     valid = false;
             return valid;
         }
