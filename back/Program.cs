@@ -19,17 +19,18 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IBankService, BankService>();
-builder.Services.AddScoped<IActivityService, ActivityService>();
 builder.Services.AddScoped<IAccessService, AccessService>();
+builder.Services.AddScoped<IActivityService, ActivityService>();
+builder.Services.AddScoped<IBankService, BankService>();
 builder.Services.AddScoped<ICryptoService, CryptoService>();
 builder.Services.AddScoped<IDebugSerivce, DebugService>();
 
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-builder.Services.AddScoped<ITransferRepository, TransferRepository>();
 builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
-builder.Services.AddScoped<IVerificationRepository, VerificationRepository>();
 builder.Services.AddScoped<ITimeOutRepository, TimeOutRepository>();
+builder.Services.AddScoped<ITransferRepository, TransferRepository>();
+builder.Services.AddScoped<IVerificationRepository, VerificationRepository>();
+builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 
 builder.Services.AddSingleton<IConfiguration>(config);
 
@@ -54,12 +55,6 @@ if (!app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-var webSocketOptions = new WebSocketOptions
-{
-    KeepAliveInterval = TimeSpan.FromMinutes(2)
-};
-
-app.UseWebSockets(webSocketOptions);
 app.UseHttpsRedirection();
 app.MapControllers();
 

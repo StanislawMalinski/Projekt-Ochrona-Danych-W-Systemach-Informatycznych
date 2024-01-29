@@ -120,7 +120,7 @@ public class BankController : ControllerBase
     }
 
     private string getOrigin(){
-        return Request.Headers["Origin"].ToString() ?? "unknown";
+        return Request.Headers.Origin.ToString() ?? "unknown";
     }
 
     private BasicResponse ValidateRequest(BasicRequest request, string origin, Token token){

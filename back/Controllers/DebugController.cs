@@ -38,7 +38,7 @@ public class DebugController : ControllerBase
     public IActionResult GetToken([FromQuery] int usedId)
     {
         DateTime date = DateTime.Now.AddDays(1);
-        return Ok(_cryptoService.GenerateToken(usedId, date));
+        return Ok(_cryptoService.GenerateToken(usedId,1, date));
     }
 
     [HttpPost("vtoken")]

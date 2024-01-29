@@ -14,5 +14,4 @@ public interface IBankService
     BasicResponse ChangePasswordCodeRequest(PassChangeRequestCode request);
     BasicResponse CodeSubmit(CodeSubmitRequest request);
     BasicResponse ChangePassword(PasswordChangeRequest request);
-    bool ValidateToken(Token token, string EmailOrAccountNumber);
 }
