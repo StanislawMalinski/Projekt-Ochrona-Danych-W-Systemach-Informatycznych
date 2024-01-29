@@ -38,27 +38,27 @@ namespace projekt.Services
             }
         }
 
-        public Token GenerateToken(string accountNumber)
+        public Token GenerateToken(int userId, int sessionId, DateTime expirationDate)
         {
-            var data = Encoding.UTF8.GetBytes(accountNumber);
+            var data = Encoding.UTF8.GetBytes(userId.ToString() + sessionId.ToString() + expirationDate.ToString());
             var cipher = rsa.Encrypt(data, false);
             var token = new Token
             {
-                AccountNumber = accountNumber,
+                UserId = userId,
+                SessionId = sessionId,
+                ExpirationDate = expirationDate,
                 Sign = Convert.ToBase64String(cipher)
             };
             return token;
         }
 
-        public bool verifyToken(Token token)
+        public bool VerifyToken(Token token)
         {
-            try{
-                var data = Convert.FromBase64String(token.Sign);
-                var plain = rsa.Decrypt(data, false);
-                return Encoding.UTF8.GetString(plain) == token.AccountNumber;
-            } catch {
-                return false;
-            }
+            var data = token.UserId.ToString() + token.SessionId.ToString() + token.ExpirationDate.ToString();
+            var cipher = Convert.FromBase64String(token.Sign);
+            var decrypted = rsa.Decrypt(cipher, false);
+            var decryptedString = Encoding.UTF8.GetString(decrypted);
+            return decryptedString == data;
         }
 
         public string HashPassword(string password, string salt)
@@ -130,7 +130,6 @@ namespace projekt.Services
         public Account EncryptAccount(Account account){
             account.Name = EncryptDbEntry(account.Name);
             account.Email = EncryptDbEntry(account.Email);
-            account.AccountNumber = EncryptDbEntry(account.AccountNumber);
             account.Password = EncryptDbEntry(account.Password);
             account.Salt = EncryptDbEntry(account.Salt);
             return account;
@@ -139,7 +138,6 @@ namespace projekt.Services
         public Account DecryptAccount(Account account){
             account.Name = DecryptDbEntry(account.Name);
             account.Email = DecryptDbEntry(account.Email);
-            account.AccountNumber = DecryptDbEntry(account.AccountNumber);
             account.Password = DecryptDbEntry(account.Password);
             account.Salt = DecryptDbEntry(account.Salt);
             return account;

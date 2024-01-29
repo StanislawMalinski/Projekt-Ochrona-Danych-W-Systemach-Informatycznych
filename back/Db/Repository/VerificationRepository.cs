@@ -16,44 +16,43 @@ namespace projekt.Db.Repository
             _cryptoService = cryptoService;
         }
 
-        public Verification? GetVerification(string email)
+        public Verification? GetVerification(int userId)
         {
             cleanup();
             return _dbcontext.Verifications
-                .Where(v => v.Email == email)
-                .OrderByDescending(v => v.Date)
+                .Where(v => v.UserId == userId)
                 .FirstOrDefault();
         }
 
-        public bool CheckIfVerificationIsValid(string email, string code)
+        public bool CheckIfVerificationIsValid(int userId, string code)
         {
-            code = _cryptoService.HashPassword(code, email);
             cleanup();
+            code = _cryptoService.HashPassword(code, "" + userId);
             return _dbcontext.Verifications
-                .Where(v => v.Email == email && v.Code == code)
-                .OrderByDescending(v => v.Date)
+                .Where(v => v.UserId == userId && v.Code == code)
                 .FirstOrDefault()
                 != null;
         }
 
-        public void CreateVerification(string email, string code)
+        public void CreateVerification(int userId, string code)
         {
-            var verification = GetVerification(email);
-            if (verification != null) DeleteVerification(email);
+            var verification = GetVerification(userId);
+            if (verification != null) DeleteVerification(userId);
+            code = _cryptoService.HashPassword(code, "" + userId);
             verification = new Verification
             {
-                Email = email,
-                Code = _cryptoService.HashPassword(code, email),
-                Date = System.DateTime.Now
+                UserId = userId,
+                Code = code,
+                Date = DateTime.Now
             };
             _dbcontext.Verifications.Add(verification);
             cleanup();
             _dbcontext.SaveChanges();
         }
 
-        public bool DeleteVerification(string email)
+        public bool DeleteVerification(int userId)
         {
-            var verification = GetVerification(email);
+            var verification = GetVerification(userId);
             if (verification == null) return false;
             _dbcontext.Verifications.Remove(verification);
             _dbcontext.SaveChanges();
@@ -63,7 +62,7 @@ namespace projekt.Db.Repository
 
         private void cleanup(){
             var verifications = _dbcontext.Verifications
-                .Where(v => v.Date.AddMinutes(5) < System.DateTime.Now);
+                .Where(v => v.Date.AddMinutes(5) < DateTime.Now);
             _dbcontext.Verifications.RemoveRange(verifications);
             _dbcontext.SaveChanges();
         }
