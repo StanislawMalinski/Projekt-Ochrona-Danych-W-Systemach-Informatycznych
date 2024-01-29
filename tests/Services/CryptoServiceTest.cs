@@ -26,18 +26,6 @@ public class CryptoServiceTest
     }
 
     [Test]
-    public void GenerateToken_ShouldReturnValidToken()
-    {
-        // Given
-        // When
-        var result = _cryptoService.GenerateToken(accountNumber);
-        // Then
-        Assert.IsNotNull(result);
-        Assert.AreEqual(result.AccountNumber, accountNumber);
-        Assert.IsTrue(_cryptoService.verifyToken(result));
-    }
-
-    [Test]
     public void HashPassword_ShouldReturnHashedPassword()
     {
         // Given
@@ -72,5 +60,53 @@ public class CryptoServiceTest
         // Then
         Assert.IsNotNull(result);
         Assert.AreEqual(plainText, result);
+    }
+
+    [Test]
+    public void GenerateToken_ShouldReturnValidToken()
+    {
+        // Given
+        int sessionId = 123;
+        DateTime expirationDate = DateTime.Now.AddHours(1);
+
+        // When
+        var result = _cryptoService.GenerateToken(sessionId, expirationDate);
+
+        // Then
+        Assert.IsNotNull(result);
+        Assert.AreEqual(sessionId, result.SessionId);
+        Assert.AreEqual(expirationDate, result.ExpirationDate);
+        Assert.IsNotNull(result.Sign);
+    }
+
+    [Test]
+    public void VerifyToken_ShouldReturnTrueForValidToken()
+    {
+        // Given
+        int sessionId = 123;
+        DateTime expirationDate = DateTime.Now.AddHours(1);
+        var token = _cryptoService.GenerateToken(sessionId, expirationDate);
+        // When
+        var result = _cryptoService.VerifyToken(token);
+        // Then
+        Assert.IsTrue(result);
+    }
+
+    [Test]
+    public void GenerateToken_ShouldReturnDifferentSignsForDifferentInputs()
+    {
+        // Given
+        int sessionId1 = 123;
+        DateTime expirationDate1 = DateTime.Now.AddHours(1);
+
+        int sessionId2 = 123;
+        DateTime expirationDate2 = DateTime.Now.AddHours(1);
+
+        // When
+        var result1 = _cryptoService.GenerateToken(sessionId1, expirationDate1);
+        var result2 = _cryptoService.GenerateToken(sessionId2, expirationDate2);
+
+        // Then
+        Assert.AreNotEqual(result1.Sign, result2.Sign);
     }
 }
