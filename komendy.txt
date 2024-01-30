@@ -1,0 +1,2 @@
+dotnet build && dotnet ef migrations add 1.0.6 && dotnet ef database update && dotnet run
+dotnet test --logger "console;verbosity=detailed"
