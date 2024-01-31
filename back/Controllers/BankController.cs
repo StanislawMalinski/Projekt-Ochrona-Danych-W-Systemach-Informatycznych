@@ -35,6 +35,17 @@ public class BankController : ControllerBase
         return getResponse(response);
     }
 
+    [HttpPost("login-code-submit")]
+    public IActionResult LoginCodeSubmit([FromBody] CodeSubmitRequest request)
+    {
+        delay();
+        var origin = getOrigin();
+        var response = ValidateRequest(request, origin);
+        response = response.Success ? _bankService.LoginCodeSubmit(request) : response;
+        _activityService.LogActivity(ActivityType.CodeSubmit, request.Email, origin, response.Success);
+        return getResponse(response);
+    }
+
     [HttpPost("register")]
     public IActionResult register([FromBody] RegisterRequest request)
     {

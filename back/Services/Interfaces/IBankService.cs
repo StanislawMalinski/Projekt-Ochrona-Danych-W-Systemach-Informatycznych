@@ -6,7 +6,8 @@ namespace projekt.Services.Interfaces;
 
 public interface IBankService
 {
-    AccountResponse Login(LoginRequest request);
+    BasicResponse Login(LoginRequest request);
+    AccountResponse LoginCodeSubmit(CodeSubmitRequest request);
     BasicResponse Logout(LogoutRequest request);
     BasicResponse Register(RegisterRequest request);
     BasicResponse CodeSubmitRegister(CodeSubmitRequest request);
