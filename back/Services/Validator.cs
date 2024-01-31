@@ -49,6 +49,11 @@ namespace projekt.Services
             return valid;
         }
 
+        public static bool validValue(decimal value)
+        {
+            return value > 0 && decimal.Round(value, 2) == value;
+        }
+
         public static bool validText(string text)
         {
             bool valid = true;

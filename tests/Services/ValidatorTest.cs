@@ -86,5 +86,23 @@ namespace tests.Services
         {
             Assert.IsTrue(Validator.validText("Hello, World!123"));
         }
+
+        [Test]
+        public void ValidValue_ShouldReturnTrueForValidValue()
+        {
+            Assert.IsTrue(Validator.validValue(1.23m));
+        }
+
+        [Test]
+        public void ValidValue_ShouldReturnFalseForInvalidZeroValue()
+        {
+            Assert.IsFalse(Validator.validValue(0m));
+        }
+
+        [Test]
+        public void ValidValue_ShouldReturnFalseForValueWithThreeDecimalPlaces()
+        {
+            Assert.IsFalse(Validator.validValue(1.001m));
+        }
     }
 }

@@ -56,7 +56,6 @@ function submitregistrationcode(body: any) {
 }
 
 function passwordchangerequestcode(body: any) {
-    body.token = getToken();
     return fetch(baseUrl + config.urls.passwordchangerequestcode, {
         method: 'POST',
         headers: {
@@ -72,7 +71,6 @@ function passwordchangerequestcode(body: any) {
 }
 
 function codesubmit(body: any) {
-    body.token = getToken();
     return fetch(baseUrl + config.urls.codesubmit, {
         method: 'POST',
         headers: {
@@ -88,8 +86,7 @@ function codesubmit(body: any) {
 }
 
 function passwordchange(body: any) {
-    body.token = getToken();
-    body.password = hashPassword(body.password)
+    console.log(body);
     return fetch(baseUrl + config.urls.passwordchange, {
         method: 'POST',
         headers: {

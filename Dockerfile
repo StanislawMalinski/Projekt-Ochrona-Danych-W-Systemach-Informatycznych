@@ -7,11 +7,11 @@ COPY ./nginx/nginx.conf ./etc/nginx/nginx.conf
 
 RUN mkdir /var/log/nginx/front
 RUN mkdir /var/log/nginx/back
-RUN mkdir /var/log/nginx/back/resouce
-RUN mkdir /var/log/nginx/back/resouce/db
+RUN mkdir /var/log/nginx/back/resource
+RUN mkdir /var/log/nginx/back/resource/db
 
 COPY back/bin/Release/net8.0/ /var/log/nginx/back
-COPY back/resource/db/ /var/log/nginx/back/resouce/db
+COPY back/resource/db/ /var/log/nginx/back/resource/db
 
 RUN apt-get update
 RUN apt-get install -y vim
@@ -22,6 +22,7 @@ RUN rm packages-microsoft-prod.deb
 RUN apt-get update
 RUN apt-get install -y dotnet-sdk-8.0
 
-CMD ["dotnet", "/var/log/nginx/back/projekt.dll"]
+#CMD ["dotnet", "/var/log/nginx/back/projekt.dll"]
+#dotnet /var/log/nginx/back/projekt.dll
 
 
