@@ -1,5 +1,5 @@
 import config from '../clientconfig.json';
-import { getToken, hashPassword, saveServerPubKey } from './utils/Cipher';
+import {getToken, hashPassword} from './utils/Cipher';
 
 var baseUrl = '';
 var accessControlAllowOrigin = '';
@@ -87,7 +87,6 @@ function codesubmit(body: any) {
     });
 }
 
-// require password
 function passwordchange(body: any) {
     body.token = getToken();
     body.password = hashPassword(body.password)
@@ -107,8 +106,6 @@ function passwordchange(body: any) {
 
 function transfer(body: any) {
     body.token = getToken();
-    (body);
-    (getToken());
     return fetch(baseUrl + config.urls.transfer, {
         method: 'POST',
         headers: {
@@ -123,8 +120,8 @@ function transfer(body: any) {
     });
 }
 
-function account(body: any) {
-    body.token = getToken();
+function account() {
+    var body = {token: getToken()};
     return fetch(baseUrl + config.urls.account, {
         method: 'POST',
         headers: {
@@ -135,22 +132,6 @@ function account(body: any) {
     }).then((response) => {;
         if (response.status === 200) {
             return response.json();
-        }
-    });
-}
-
-function getPubKey() {
-    return fetch(baseUrl + config.urls.pubkey, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': accessControlAllowOrigin
-        }
-    }).then((response) => {
-        if (response.status === 200) {;
-            response.text().then((text) => {
-                saveServerPubKey(text);
-            });
         }
     });
 }
@@ -179,7 +160,6 @@ export {login,
         passwordchange,
         transfer, 
         account, 
-        getPubKey,
         getactivities}
 
 

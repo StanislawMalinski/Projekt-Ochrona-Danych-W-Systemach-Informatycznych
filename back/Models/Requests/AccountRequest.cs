@@ -8,7 +8,9 @@ namespace projekt.Models.Requests
     {
         public AccountRequest()
         {
-            Token = new Token();
+            Token = new Token(){
+                Sign = ""
+            };
         }
         public required Token Token { get; set; }
 

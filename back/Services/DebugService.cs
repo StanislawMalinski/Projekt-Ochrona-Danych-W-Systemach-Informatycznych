@@ -65,7 +65,8 @@ public class DebugService : IDebugSerivce
                 Name = name,
                 Email = name + "@gmail.com",
                 Password = "1234",
-                Balance = 100M
+                Balance = 100M,
+                IsVerified = true
             };
            _accountRepository.Register(account);
            _activityRepository.LogActivity(new Activity
@@ -105,6 +106,8 @@ public class DebugService : IDebugSerivce
                 }
             }
         }
+
+        
     }
 }
 

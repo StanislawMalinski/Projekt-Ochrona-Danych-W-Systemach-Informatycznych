@@ -13,7 +13,9 @@ namespace projekt.Models.Requests
             Recipient = "";
             Value = 0;
             Title = "";
-            Token = new Token();
+            Token = new Token(){
+                Sign = ""
+            };
         }
         public required string AccountNumber { get; set; }
         public required string RecipientAccountNumber { get; set; }

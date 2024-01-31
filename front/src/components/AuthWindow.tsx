@@ -4,7 +4,7 @@ import LoginComp from './auth/LoginComp';
 import RegisterComp from './auth/RegisterComp';
 
 import {login, register, passwordchangerequestcode, codesubmit, submitregistrationcode, passwordchange} from '../Client';
-import { getToken, saveCredentials } from '../utils/Cipher';
+import { saveCredentials } from '../utils/Cipher';
 import PassChangeComp from './auth/PassChangeComp';
 
 
@@ -45,7 +45,7 @@ function AuthWindow(props: AuthWindowProps) {
                 login(loginRequest)
                 .then((response) => {
                     if (response.success) {
-                        saveCredentials(loginRequest.email, loginRequest.password, JSON.stringify(response.token))
+                        saveCredentials(loginRequest.email, JSON.stringify(response.token))
                         setLogged(true);
                         const { token, ...account } = response;
                         setAccount(account);

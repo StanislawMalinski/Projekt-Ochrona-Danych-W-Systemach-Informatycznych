@@ -11,7 +11,9 @@ namespace projekt.Models.Responses
             History = new List<Transfer>();
             Message = "";
             Success = false;
-            Token = new Token();
+            Token = new Token(){
+                Sign = ""
+            };
         }
         public AccountResponse(string message)
         {
@@ -20,7 +22,9 @@ namespace projekt.Models.Responses
             History = new List<Transfer>();
             Message = message;
             Success = false;
-            Token = new Token();
+            Token = new Token(){
+                Sign = ""
+            };
         }
         public string AccountNumber { get; set; }
         public decimal Balance { get; set; }

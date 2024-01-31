@@ -54,10 +54,16 @@ namespace projekt.Services
 
         public bool VerifyToken(Token token)
         {
+            //Console.WriteLine("user id: " + token.UserId);
+            //Console.WriteLine("session id: " + token.SessionId);
+            //Console.WriteLine("date: " + token.ExpirationDate);
             var data = token.UserId.ToString() + token.SessionId.ToString() + token.ExpirationDate.ToString();
             var cipher = Convert.FromBase64String(token.Sign);
             var decrypted = rsa.Decrypt(cipher, false);
             var decryptedString = Encoding.UTF8.GetString(decrypted);
+            //Console.WriteLine("sign authenticated: " + decryptedString == data);
+            //Console.WriteLine("sign: " + decryptedString + " len: " + decryptedString.Length);
+            //Console.WriteLine("provided: " + data + " len: " + data.Length);
             return decryptedString == data;
         }
 

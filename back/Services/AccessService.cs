@@ -55,9 +55,13 @@ public class AccessService : IAccessService
 
     public bool VerifyToken(Token token)
     {
-        if(token == null) return false;
-        if(token.ExpirationDate < DateTime.Now) return false;
+        //Console.WriteLine("token is not null:" + (token != null));
+        if (token == null) return false;
+        //Console.WriteLine("token is not expired:" + (token.ExpirationDate > DateTime.Now));
+        if (token.ExpirationDate < DateTime.Now) return false;
+        //Console.WriteLine("token is valid:" + _cryptoService.VerifyToken(token));
         if(!_cryptoService.VerifyToken(token)) return false;
+        //Console.WriteLine("token is valid: Awsome");
         return true;
     }
 
