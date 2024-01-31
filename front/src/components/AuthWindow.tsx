@@ -3,7 +3,7 @@ import '../styles/AuthWindow.css'
 import LoginComp from './auth/LoginComp';
 import RegisterComp from './auth/RegisterComp';
 
-import {login, register, passwordchangerequestcode, codesubmit, submitregistrationcode, passwordchange} from '../Client';
+import {login, logincodesubmit, register, passwordchangerequestcode, codesubmit, submitregistrationcode, passwordchange} from '../Client';
 import { saveCredentials } from '../utils/Cipher';
 import PassChangeComp from './auth/PassChangeComp';
 
@@ -30,7 +30,6 @@ function AuthWindow(props: AuthWindowProps) {
     const [registerRequest, setRegisterRequest]                     = useState({email: "", password: ""})
     const [registerCodeRequest, setRegisterCodeRequest]             = useState({email: "", code: ""})
    
-
     const [message, setMessage] = useState("");
     const [disabled, setDisabled] = useState(false);
 
@@ -43,6 +42,15 @@ function AuthWindow(props: AuthWindowProps) {
         switch (m) {
             case "login":
                 login(loginRequest)
+                .then((response) => {
+                    if (response.success) {
+                        setMode("login-code")    
+                    } 
+                    setMessage(response.message);
+                });
+                break;
+            case "login-code":
+                logincodesubmit(codeRequest)
                 .then((response) => {
                     if (response.success) {
                         saveCredentials(loginRequest.email, JSON.stringify(response.token))
@@ -113,9 +121,13 @@ function AuthWindow(props: AuthWindowProps) {
         <p className='login-option' onClick={() => setMode("login")}>You have an account?</p>
         </>)
     var log = (<>
-        <LoginComp setLoginRequest={setLoginRequest}/>
+        <LoginComp 
+        setLoginRequest={setLoginRequest}
+        setCodeRequest={setCodeRequest}
+        mode={mode}/>
+        {mode == "login" ? <>
         <p className='login-option' onClick={() => setMode("pass-input-mail")}>Forgot password?</p>
-        <p className='login-option ' onClick={() => setMode("reg-input-cred")} >Sign in</p>
+        <p className='login-option ' onClick={() => setMode("reg-input-cred")} >Sign in</p></> : <></>}
         </>);
     var pass = (<>
         <PassChangeComp 
@@ -140,6 +152,7 @@ function AuthWindow(props: AuthWindowProps) {
                 cc = pass;
                 break;
             case "login":
+            case "login-code":
             default:
                 cc = log;
                 break;

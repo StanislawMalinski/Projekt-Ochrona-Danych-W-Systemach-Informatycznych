@@ -29,6 +29,8 @@
     "urls":
     {
         "login": "/login",
+        "logincodesubmit": "/login-code-submit",
+        "logout": "/logout",
         "register": "/register",
         "submitregistrationcode": "/code-submit-register",
         "passwordchangerequestcode": "/pass-change-request-code",
