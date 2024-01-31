@@ -13,4 +13,15 @@ RUN mkdir /var/log/nginx/back/resouce/db
 COPY back/bin/Release/net8.0/ /var/log/nginx/back
 COPY back/resource/db/ /var/log/nginx/back/resouce/db
 
+RUN apt-get update
+RUN apt-get install -y vim
+RUN apt-get install -y wget
+RUN wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+RUN dpkg -i packages-microsoft-prod.deb
+RUN rm packages-microsoft-prod.deb
+RUN apt-get update
+RUN apt-get install -y dotnet-sdk-8.0
+
+CMD ["dotnet", "/var/log/nginx/back/projekt.dll"]
+
 
