@@ -181,4 +181,14 @@ public class BankService : IBankService
         _verificationRepository.DeleteVerification(result.Id);
         return new BasicResponse {Message = "Password has been changed.",Success = true};
     }
+
+    public BasicResponse Logout(LogoutRequest request)
+    {
+        var userId = _accessService.GetUserId(request.Token);
+        var errorResponse = new BasicResponse { Message = "Logout failed.", Success = false };
+        if (userId == -1) return errorResponse;
+        if(!_accessService.VerifyToken(request.Token)) return errorResponse;
+        _accessService.RemoveSession(request.Token);
+        return new BasicResponse { Message = "Logout successful.", Success = true };
+    }
 }

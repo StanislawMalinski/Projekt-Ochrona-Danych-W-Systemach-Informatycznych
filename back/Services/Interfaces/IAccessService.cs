@@ -7,4 +7,5 @@ public interface IAccessService
     int GetUserId(Token token);
     Token GetToken(int usedId);
     bool VerifyToken(Token token);
+    void RemoveSession(Token token);
 }

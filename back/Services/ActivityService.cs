@@ -37,20 +37,6 @@ public class ActivityService : IActivityService
         publishActivity(activity);
     }
 
-    public void LogActivity(ActivityType type, string AssociatedEmailOrAccountNumber, bool success)
-    {
-        var email = GetEmail(AssociatedEmailOrAccountNumber);
-        var activity = new Activity
-        {
-            Id = 0,
-            Date = DateTime.Now,
-            AssociatedEmail = email,
-            Origin = "",
-            Type = type,
-            Success = success
-        };
-        publishActivity(activity);
-    }
 
     private string GetEmail(string AssociatedEmailOrAccountNumber)
     {
@@ -69,5 +55,24 @@ public class ActivityService : IActivityService
     public List<Activity> GetActivities(string email)
     {
         return _activityRepository.GetActivities(email);
+    }
+
+    public void LogActivity(ActivityType type, string AssociatedEmailOrOrign, bool success, bool origin = false)
+    {
+        var email = "";
+        if (!origin)
+        {
+            email = GetEmail(AssociatedEmailOrOrign);
+        }
+        var activity = new Activity
+        {
+            Id = 0,
+            Date = DateTime.Now,
+            AssociatedEmail = origin ? "" : email,
+            Origin = origin ? AssociatedEmailOrOrign : "",
+            Type = type,
+            Success = success
+        };
+        publishActivity(activity);
     }
 }
