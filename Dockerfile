@@ -1,15 +1,11 @@
-FROM nginx:alpine
+FROM nginx:latest
 EXPOSE 5000
 EXPOSE 3000
 
 
-COPY ./front ./front
-COPY ./back ./back
+COPY ./front/dist/ ./usr/share/nginx/html
+COPY ./nginx/nginx.conf ./etc/nginx/nginx.conf
 
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y nodejs \
-    npm               
+RUN mkdir /var/log/nginx/front
+RUN mkdir /var/log/nginx/back
 
-RUN npm i ./front/
-RUN npm run serve --prefix ./front/
-RUN dotnet run --project ./back/projekt.csproj
