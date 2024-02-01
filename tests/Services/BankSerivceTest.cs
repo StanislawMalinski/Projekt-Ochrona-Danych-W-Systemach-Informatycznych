@@ -14,6 +14,7 @@ namespace Tests.Services
     {
         private Mock<IAccountRepository> _accountRepositoryMock;
         private Mock<IAccessService> _accessServiceMock;
+        private Mock<IActivityRepository> _activityRepositoryMock;
         private Mock<ITransferRepository> _transferRepositoryMock;
         private Mock<IVerificationRepository> _verificationRepositoryMock;
         private Mock<IDebugSerivce> _debugServiceMock;
@@ -55,6 +56,7 @@ namespace Tests.Services
             _transferRepositoryMock = new Mock<ITransferRepository>();
             _accessServiceMock = new Mock<IAccessService>();
             _accountRepositoryMock = new Mock<IAccountRepository>();
+            _activityRepositoryMock = new Mock<IActivityRepository>();
             _verificationRepositoryMock = new Mock<IVerificationRepository>();
             _debugServiceMock = new Mock<IDebugSerivce>();
 
@@ -67,6 +69,7 @@ namespace Tests.Services
             _bankService = new BankService(
                 _accountRepositoryMock.Object, 
                 _accessServiceMock.Object,
+                _activityRepositoryMock.Object,
                 _transferRepositoryMock.Object,
                 _verificationRepositoryMock.Object,
                 _debugServiceMock.Object, 
@@ -83,7 +86,7 @@ namespace Tests.Services
             //When
             var result = _bankService.Login(loginRequest);
             //Then
-            Assert.AreEqual(result.Message, "Login successful.");
+            Assert.AreEqual(result.Message, "Verification code has been sent to your email address.");
         }
     }
 }
