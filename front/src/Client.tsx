@@ -1,5 +1,5 @@
 import config from '../clientconfig.json';
-import {getToken, hashPassword} from './utils/Cipher';
+import {getToken} from './utils/Cipher';
 
 var baseUrl = '';
 var accessControlAllowOrigin = '';
