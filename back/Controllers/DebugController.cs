@@ -20,34 +20,34 @@ public class DebugController : ControllerBase
         _activityService = activityService;
     }
 
-    [HttpPost("seed-db")]
+    //[HttpPost("seed-db")]
     public IActionResult SeedDb()
     {
         _debugService.SeedDatabase();
         return Ok();
     }
 
-    [HttpPost("clean-db")]
+    //[HttpPost("clean-db")]
     public IActionResult CleanDb()
     {
         _debugService.CleanDatabase();
         return Ok();
     }
 
-    [HttpGet("token")]
+    //[HttpGet("token")]
     public IActionResult GetToken([FromQuery] int usedId)
     {
         DateTime date = DateTime.Now.AddDays(1);
         return Ok(_cryptoService.GenerateToken(usedId,1, date));
     }
 
-    [HttpPost("vtoken")]
+    //[HttpPost("vtoken")]
     public IActionResult VerifyToken([FromBody] Token token)
     {
         return Ok(_cryptoService.VerifyToken(token));
     }
 
-    [HttpGet("activities")]
+    //[HttpGet("activities")]
     public IActionResult GetActivities([FromQuery] string email)
     {
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
