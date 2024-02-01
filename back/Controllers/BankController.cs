@@ -35,7 +35,16 @@ public class BankController : ControllerBase
         return getResponse(response);
     }
 
-
+    [HttpPost("login-code-submit")]
+    public IActionResult LoginCodeSubmit([FromBody] CodeSubmitRequest request)
+    {
+        delay();
+        var origin = getOrigin();
+        var response = ValidateRequest(request, origin);
+        response = response.Success ? _bankService.LoginCodeSubmit(request) : response;
+        _activityService.LogActivity(ActivityType.CodeSubmit, request.Email, origin, response.Success);
+        return getResponse(response);
+    }
 
     [HttpPost("register")]
     public IActionResult register([FromBody] RegisterRequest request)
@@ -44,7 +53,7 @@ public class BankController : ControllerBase
         var origin = getOrigin();
         var response = ValidateRequest(request, origin);
         response = response.Success ? _bankService.Register(request) : response;
-        _activityService.LogActivity(ActivityType.Register, request.Email,origin, response.Success);
+        _activityService.LogActivity(ActivityType.Register, request.Email, origin, response.Success);
         return getResponse(response);
     } 
 
@@ -55,7 +64,7 @@ public class BankController : ControllerBase
         var origin = getOrigin();
         var response = ValidateRequest(request, origin);
         response = response.Success ? _bankService.CodeSubmitRegister(request) : response;
-        _activityService.LogActivity(ActivityType.CodeSubmit, request.Email,origin, response.Success);
+        _activityService.LogActivity(ActivityType.CodeSubmit, request.Email, origin, response.Success);
         return getResponse(response);
     }
 
@@ -66,7 +75,7 @@ public class BankController : ControllerBase
         var origin = getOrigin();
         var response = ValidateRequest(request, origin);
         response = response.Success ? _bankService.ChangePasswordCodeRequest(request) : response;
-        _activityService.LogActivity(ActivityType.ChangePasswordCodeRequest, request.Email,origin, response.Success);
+        _activityService.LogActivity(ActivityType.ChangePasswordCodeRequest, request.Email, origin, response.Success);
         return getResponse(response);
     }
 
@@ -77,7 +86,7 @@ public class BankController : ControllerBase
         var origin = getOrigin();
         var response = ValidateRequest(request, origin);
         response = response.Success ? _bankService.CodeSubmit(request) : response;
-        _activityService.LogActivity(ActivityType.CodeSubmit, request.Email, origin,response.Success);
+        _activityService.LogActivity(ActivityType.CodeSubmit, request.Email, origin, response.Success);
         return getResponse(response);
     }
 
@@ -88,7 +97,18 @@ public class BankController : ControllerBase
         var origin = getOrigin();
         var response = ValidateRequest(request, origin);
         response = response.Success ? _bankService.ChangePassword(request) : response;
-        _activityService.LogActivity(ActivityType.ChangePassword, request.Email,origin, response.Success);
+        _activityService.LogActivity(ActivityType.ChangePassword, request.Email, origin, response.Success);
+        return getResponse(response);
+    }
+
+    [HttpPost("logout")]
+    public IActionResult Logout([FromBody] LogoutRequest request)
+    {
+        delay();
+        var origin = getOrigin();
+        var response = ValidateRequest(request, origin, request.Token);
+        response = response.Success ? _bankService.Logout(request) : response;
+        _activityService.LogActivity(ActivityType.Logout, origin, response.Success, origin: true);
         return getResponse(response);
     }
 
@@ -110,7 +130,7 @@ public class BankController : ControllerBase
         var origin = getOrigin();
         var response = ValidateRequest(request, origin, request.Token);
         response = response.Success ? _bankService.GetAccount(request) : response;
-        _activityService.LogActivity(ActivityType.GetAccount, origin, response.Success);
+        _activityService.LogActivity(ActivityType.GetAccount, origin, response.Success, origin: true);
         return getResponse(response);
     }
 

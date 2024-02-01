@@ -77,20 +77,21 @@ public class BankService : IBankService
             Token = request.Token
         };
     }
-    public AccountResponse Login(LoginRequest request)
+    public BasicResponse Login(LoginRequest request)
     {
         var ValidUser = _accountRepository.ValidUser(request);
-        if(!ValidUser)  return new AccountResponse("Invalid email or password.");
+        if(!ValidUser)  return new BasicResponse("Invalid email or password.");
         var result = _accountRepository.GetAccountByEmail(request.Email);
-        if (result == null) return new AccountResponse ("Invalid email or password.");
-        if (!result.IsVerified) return new AccountResponse("Account is not verified.");
-        return new AccountResponse{
-            AccountNumber = result.AccountNumber,
-            Balance = result.Balance,
-            History = _transferRepository.GetHistory(result.AccountNumber),
-            Message = "Login successful.",
+        if (result == null) return new BasicResponse ("Invalid email or password.");
+        if (!result.IsVerified) return new BasicResponse("Account is not verified.");
+        _debug_service.LogMessage(request.Email, "Login successful.");
+        var verification_code = GenerateVerificationCode();
+        var account = _accountRepository.GetAccountByEmail(request.Email);
+        _verificationRepository.CreateVerification(account.Id, verification_code);
+        SendLoginCodeSubmitMail(request.Email, verification_code); 
+        return new BasicResponse{
+            Message = "Verification code has been sent to your email address.",
             Success = true,
-            Token = _accessService.GetToken(result.Id)
         };
     }
 
@@ -144,17 +145,6 @@ public class BankService : IBankService
         };
     }
 
-    private void SendVerificationMessage(string email, string verification_code)
-    {
-        var message = $"Dear customer. Here is your verification code: {verification_code}";
-        _debug_service.LogMessage(email, message);
-    }
-
-    private void SendPasswordMessageChange(string email, string verificationCode){
-        var message = $"Dear customer. There is pending password change on your account. Here is your verification code: {verificationCode}";
-        _debug_service.LogMessage(email, message);
-    }
-
     private string GenerateVerificationCode()
     {
         Random random = new Random();
@@ -201,5 +191,50 @@ public class BankService : IBankService
         return new BasicResponse {Message = "Password has been changed.",Success = true};
     }
 
- 
+    public BasicResponse Logout(LogoutRequest request)
+    {
+        var userId = _accessService.GetUserId(request.Token);
+        var errorResponse = new BasicResponse { Message = "Logout failed.", Success = false };
+        if (userId == -1) return errorResponse;
+        if(!_accessService.VerifyToken(request.Token)) return errorResponse;
+        _accessService.RemoveSession(request.Token);
+        return new BasicResponse { Message = "Logout successful.", Success = true };
+    }
+
+    public AccountResponse LoginCodeSubmit(CodeSubmitRequest request)
+    {
+        var accountExists = _accountRepository.CheckIfAccountExistsByEmail(request.Email);
+        var errorResponse = new AccountResponse("Error has occured when verifying account.");
+        if(!accountExists) return errorResponse;
+        var account = _accountRepository.GetAccountByEmail(request.Email);
+        var result = _verificationRepository.CheckIfVerificationIsValid(account.Id, request.Code);
+        if(!result) return errorResponse;
+        _verificationRepository.DeleteVerification(account.Id);
+        return new AccountResponse{
+            AccountNumber = account.AccountNumber,
+            Balance = account.Balance,
+            History = _transferRepository.GetHistory(account.AccountNumber),
+            Message = "Login successful.",
+            Success = true,
+            Token = _accessService.GetToken(account.Id)
+        };
+    }
+
+    private void SendVerificationMessage(string email, string verification_code)
+    {
+        var message = $"Dear customer. Here is your verification code: {verification_code}";
+        _debug_service.LogMessage(email, message);
+    }
+
+    private void SendPasswordMessageChange(string email, string verificationCode){
+        var message = $"Dear customer. There is pending password change on your account. Here is your verification code: {verificationCode}";
+        _debug_service.LogMessage(email, message);
+    }
+
+    private void SendLoginCodeSubmitMail(string email, string verification_code)
+    {
+        var message = $"Dear customer. Here is your verification code for logging in: {verification_code}";
+        _debug_service.LogMessage(email, message);
+    }
+
 }

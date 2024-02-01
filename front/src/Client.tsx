@@ -27,6 +27,36 @@ function login(body: any) {
     });
 }
 
+
+function logincodesubmit(body: any) {
+    return fetch(baseUrl + config.urls.logincodesubmit, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': accessControlAllowOrigin
+        },
+        body: JSON.stringify(body)
+    }).then((response) => {
+        if (response.status === 200) {
+            return response.json();
+        }
+    });
+}
+
+
+function logout() {
+    var body = {token: getToken()};
+    return fetch(baseUrl + config.urls.logout, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': accessControlAllowOrigin,
+            'Authorization': body.token
+        },
+        body: JSON.stringify(body)
+    });
+}
+
 // require password
 function register(body: any) {
     return fetch(baseUrl + config.urls.register, {
@@ -150,6 +180,8 @@ function getactivities(email: string) {
 }
 
 export {login,
+        logincodesubmit,
+        logout,
         register,
         submitregistrationcode,
         passwordchangerequestcode, 

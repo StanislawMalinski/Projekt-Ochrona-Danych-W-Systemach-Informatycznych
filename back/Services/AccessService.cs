@@ -38,16 +38,6 @@ public class AccessService : IAccessService
         return count <= allowedCount;
     }
 
-    public bool ShouldReplayToToken(Token token)
-    {
-        return true;
-    }
-
-    public int GetUserForToken(Token token)
-    {
-        return _sessionRepository.GetUserIdForSession(token.SessionId);
-    }
-
     public int GetUserId(Token token)
     {
         return _sessionRepository.GetUserIdForSession(token.SessionId);
@@ -72,6 +62,10 @@ public class AccessService : IAccessService
         var ssessionId =_sessionRepository.CreateSession(usedId, expirationDate);
         Token token = _cryptoService.GenerateToken(usedId, ssessionId, expirationDate);
         return token;
+    }
+
+    public void RemoveSession(Token token){
+        _sessionRepository.DeleteSession(token.SessionId);
     }
 }
 
