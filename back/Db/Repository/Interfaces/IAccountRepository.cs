@@ -11,7 +11,7 @@ public interface IAccountRepository
     public Account GetAccount(string accountNumber);
     public Account GetAccountByEmail(string email, bool verified = true);
     public Account GetAccountByUserId(int userId);
-    public bool IsTransferPossible(string accountNumber, decimal value);
+        public bool IsTransferPossible(string accountNumber, decimal value);
     public bool MakeTransfer(Transfer transfer);
     public Account Register(Account account);
     public Account Register(RegisterRequest request);

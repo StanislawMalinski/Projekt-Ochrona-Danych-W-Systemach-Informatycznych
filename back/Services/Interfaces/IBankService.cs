@@ -6,12 +6,13 @@ namespace projekt.Services.Interfaces;
 
 public interface IBankService
 {
-    AccountResponse Login(LoginRequest request);
-    BasicResponse Register(RegisterRequest request);
-    BasicResponse CodeSubmitRegister(CodeSubmitRequest request);
-    AccountResponse GetAccount(AccountRequest accountNumber);
-    AccountResponse NewTransfer(TransferRequest request);    
+    BasicResponse ChangePassword(PasswordChangeRequest request);
     BasicResponse ChangePasswordCodeRequest(PassChangeRequestCode request);
     BasicResponse CodeSubmit(CodeSubmitRequest request);
-    BasicResponse ChangePassword(PasswordChangeRequest request);
+    BasicResponse CodeSubmitRegister(CodeSubmitRequest request);
+    AccountResponse GetAccount(AccountRequest accountNumber);
+    ReleventOriginsResponse GetRelevantOrigins(Token token);
+    AccountResponse Login(LoginRequest request);
+    AccountResponse NewTransfer(TransferRequest request);
+    BasicResponse Register(RegisterRequest request);
 }

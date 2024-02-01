@@ -49,5 +49,15 @@ namespace projekt.Db.Repository
                 .ForEach(a => _bankDbContext.Activities.Remove(a));
             _bankDbContext.SaveChanges();
         }
+
+        public List<string> GetRelevantOrigins(string email)
+        {
+            var origins = _bankDbContext.Activities
+                .Where(a => a.AssociatedEmail == email)
+                .Select(a => a.Origin)
+                .Distinct()
+                .ToList();
+            return origins != null ? origins : new List<string>(); 
+        }
     }
 }

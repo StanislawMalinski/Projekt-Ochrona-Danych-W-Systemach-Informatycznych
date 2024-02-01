@@ -10,5 +10,6 @@ public enum ActivityType
     ChangePassword = 5,
     GetActivities =6 ,
     ChangePasswordCodeRequest = 7,
-    CodeSubmit = 8
+    CodeSubmit = 8,
+    GetRelevantOrigins = 9
 }

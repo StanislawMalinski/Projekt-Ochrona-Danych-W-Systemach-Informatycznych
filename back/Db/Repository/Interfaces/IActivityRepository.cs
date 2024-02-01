@@ -8,6 +8,7 @@ namespace projekt.Db.Repository
     {
         public int GetAcitivityCountForLastNMinutes(string origin, int minutes);
         public List<Activity> GetActivities(string email);
+        List<string> GetRelevantOrigins(string email);
         public Activity LogActivity(Activity activity);
     }
 }

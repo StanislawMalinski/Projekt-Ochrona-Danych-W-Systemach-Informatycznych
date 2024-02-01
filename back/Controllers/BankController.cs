@@ -114,6 +114,17 @@ public class BankController : ControllerBase
         return getResponse(response);
     }
 
+    [HttpPost("origins")]
+    public IActionResult GetRelevantOrigins([FromBody] ReleventOriginsRequest request)
+    {
+        delay();
+        var origin = getOrigin();
+        var response = ValidateRequest(request, origin, request.Token);
+        response = response.Success ? _bankService.GetRelevantOrigins(request.Token) : response;
+        _activityService.LogActivity(ActivityType.GetRelevantOrigins, origin, response.Success);
+        return getResponse(response);
+    }
+
     private void delay(){
         var delay = _configuration.GetSection("ClassConfig:Delay").Get<int>();
         if(delay > 0) Thread.Sleep(delay);

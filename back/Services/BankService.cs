@@ -12,6 +12,7 @@ public class BankService : IBankService
 {
     private readonly IAccountRepository _accountRepository;
     private readonly IAccessService _accessService;
+    private readonly IActivityRepository _acctivityRepository;
     private readonly ITransferRepository _transferRepository;
     private readonly IVerificationRepository _verificationRepository;
     private readonly IDebugSerivce _debug_service;
@@ -19,12 +20,14 @@ public class BankService : IBankService
 
     public BankService(IAccountRepository accountRepository,
         IAccessService accessService, 
+        IActivityRepository acctivityRepository,
         ITransferRepository transferRepository, 
-        IVerificationRepository verificationRepository, 
+        IVerificationRepository verificationRepository,
         IDebugSerivce debug_service,
         IConfiguration configuration)
     {
         _accountRepository = accountRepository;
+        _acctivityRepository = acctivityRepository;
         _accessService = accessService;
         _transferRepository = transferRepository;
         _verificationRepository = verificationRepository;
@@ -88,6 +91,22 @@ public class BankService : IBankService
             Message = "Login successful.",
             Success = true,
             Token = _accessService.GetToken(result.Id)
+        };
+    }
+
+   public ReleventOriginsResponse GetRelevantOrigins(Token token)
+    {
+        var errorResponse = new ReleventOriginsResponse("Error while getting relevant origins.");
+        var userId = _accessService.GetUserId(token);
+        if (userId == -1) return errorResponse;
+        var result = _accountRepository.GetAccountByUserId(userId);
+        if(result == null) return errorResponse;
+        if (!result.IsVerified) return errorResponse;
+        var origins = _acctivityRepository.GetRelevantOrigins(result.Email);
+        return new ReleventOriginsResponse(){
+            Message = "Origins found.",
+            Success = true,
+            Origins = origins
         };
     }
 
@@ -181,4 +200,6 @@ public class BankService : IBankService
         _verificationRepository.DeleteVerification(result.Id);
         return new BasicResponse {Message = "Password has been changed.",Success = true};
     }
+
+ 
 }
