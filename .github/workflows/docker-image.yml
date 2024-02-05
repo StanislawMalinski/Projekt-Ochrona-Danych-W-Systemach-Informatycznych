@@ -33,7 +33,7 @@ jobs:
       - name: Build Docker Image
         env:
           IMAGE_NAME: bank-front #create env called IMAGE_NAME consisted of actual name of Docker Image after we build
-          PROJECT_ID: service-project-ardhan-1
+          PROJECT_ID: pamiw-411315
         run: docker build -t $IMAGE_NAME:latest ./front/. #build the docker image
         
       - name: Configure Docker Client
