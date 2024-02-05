@@ -34,7 +34,7 @@ jobs:
         env:
           IMAGE_NAME: bank #create env called IMAGE_NAME consisted of actual name of Docker Image after we build
           PROJECT_ID: service-project-ardhan-1
-        run: docker build -t $IMAGE_NAME:latest . #build the docker image
+        run: docker build -t $IMAGE_NAME:latest ./front/. #build the docker image
         
       - name: Configure Docker Client
         run:  |-
