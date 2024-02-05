@@ -20,7 +20,7 @@ jobs:
         with:
             registry: ${{ env.REGISTRY }} #parse REGISTRY env value to here. Make sure it is correctly stating ghcr.io
             username: ${{ github.actor }} #this will be our github account
-            password: ${{ secrets.GH_PAT }} #parse the value of repository secret called CR_PAT that we have created earlier
+            password: ${{ secrets.GH_TOKEN }} #parse the value of repository secret called CR_PAT that we have created earlier
       - name: Login to GCR
         env:
           PROJECT_ID: pamiw-411315 #create env called PROJECT_ID consisted of our actual GCP Project ID
