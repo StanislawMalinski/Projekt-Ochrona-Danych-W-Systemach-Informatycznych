@@ -23,7 +23,7 @@ jobs:
             password: ${{ secrets.GH_PAT }} #parse the value of repository secret called CR_PAT that we have created earlier
       - name: Login to GCR
         env:
-          PROJECT_ID: service-project-ardhan-1 #create env called PROJECT_ID consisted of our actual GCP Project ID
+          PROJECT_ID: pamiw-411315 #create env called PROJECT_ID consisted of our actual GCP Project ID
         uses: google-github-actions/setup-gcloud@v0.3.0 #checkouts GCR repo, so this workflow can access it
         with:
           service_account_key: ${{ secrets.GOOGLE_SERIVCE_KEY }} #parse the value of repository secret called SERVICE_ACCOUNT_KEY that we have created earlier
@@ -32,7 +32,7 @@ jobs:
           
       - name: Build Docker Image
         env:
-          IMAGE_NAME: linux_tweet_app #create env called IMAGE_NAME consisted of actual name of Docker Image after we build
+          IMAGE_NAME: bank #create env called IMAGE_NAME consisted of actual name of Docker Image after we build
           PROJECT_ID: service-project-ardhan-1
         run: docker build -t $IMAGE_NAME:latest . #build the docker image
         
@@ -43,7 +43,7 @@ jobs:
       - name: Push Docker Image to Container Registry GCR
         env: 
           IMAGE_NAME: linux_tweet_app
-          PROJECT_ID: service-project-ardhan-1
+          PROJECT_ID: pamiw-411315
         #tag docker image to gcr image format then push to gcr
         run: |-
           docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest 
