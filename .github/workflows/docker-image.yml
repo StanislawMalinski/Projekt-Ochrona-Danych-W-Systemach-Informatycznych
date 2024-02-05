@@ -32,7 +32,7 @@ jobs:
           
       - name: Build Docker Image
         env:
-          IMAGE_NAME: bank #create env called IMAGE_NAME consisted of actual name of Docker Image after we build
+          IMAGE_NAME: bank-front #create env called IMAGE_NAME consisted of actual name of Docker Image after we build
           PROJECT_ID: service-project-ardhan-1
         run: docker build -t $IMAGE_NAME:latest ./front/. #build the docker image
         
@@ -42,7 +42,7 @@ jobs:
         
       - name: Push Docker Image to Container Registry GCR
         env: 
-          IMAGE_NAME: linux_tweet_app
+          IMAGE_NAME: bank-front
           PROJECT_ID: pamiw-411315
         #tag docker image to gcr image format then push to gcr
         run: |-
