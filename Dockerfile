@@ -1,15 +1,20 @@
-FROM nginx:alpine
+FROM node:18-alpine
+
 EXPOSE 5000
-EXPOSE 3000
 
+WORKDIR /app
+COPY front/package.json /app
+COPY front/src /app/src
+COPY front/public /app/public
+COPY front/index.html /app
+COPY front/public /app/public
+COPY front/clientconfig.json /app
+COPY front/vite.config.ts /app
+COPY front/tsconfig.json /app
+COPY front/tsconfig.node.json /app
 
-COPY ./front ./front
-COPY ./back ./back
+RUN npm install
+RUN npm run build
 
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y nodejs \
-    npm               
+CMD ["npm", "run", "serve"]
 
-RUN npm i ./front/
-RUN npm run serve --prefix ./front/
-RUN dotnet run --project ./back/projekt.csproj

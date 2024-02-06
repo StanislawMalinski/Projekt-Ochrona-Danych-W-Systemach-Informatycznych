@@ -9,6 +9,11 @@ namespace projekt.Models.Responses
             Success = false;
             Message = "";
         }
+        public BasicResponse(string message)
+        {
+            Success =false;
+            Message = message;
+        }
         public bool Success { get; set; }
         public string Message { get; set; }
     }

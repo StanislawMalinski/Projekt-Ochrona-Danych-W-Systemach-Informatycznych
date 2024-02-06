@@ -4,14 +4,13 @@ namespace projekt.Models.Dtos
 {
     public class Token
     {
-        public string AccountNumber { get; set; }
-        public string Sign { get; set; }
-        public string Timestamp { get; set; }
-        public string Expiration { get; set; }
-
-        public bool isValid()
+        public Token()
         {
-            return CryptoService.verifyToken(this);
+            Sign = "";
         }
+        public int UserId { get; set; }
+        public int SessionId { get; set; }
+        public DateTime ExpirationDate { get; set; }
+        public required string Sign { get; set; }
     }
 }

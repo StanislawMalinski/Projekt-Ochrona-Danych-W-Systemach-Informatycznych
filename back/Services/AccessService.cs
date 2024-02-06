@@ -1,31 +1,71 @@
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using projekt.Db.Repository;
 using projekt.Db.Repository.Interfaces;
+using projekt.Models.Dtos;
 using projekt.Services.Interfaces;
 
 namespace projekt.Services;
 public class AccessService : IAccessService
 {
     private readonly ITimeOutRepository _timeoutsRepository;
+    private readonly ICryptoService _cryptoService;
     private readonly IActivityRepository _activityRepository;
+    private readonly ISessionRepository _sessionRepository;
     private readonly IConfiguration _configuration;
-    private CorsPolicy _corsPolicy;
 
-    public AccessService(ITimeOutRepository timeoutsRepository, IActivityRepository activityRepository, IConfiguration configuration)
+    public AccessService(
+            ITimeOutRepository timeoutsRepository, 
+            ICryptoService cryptoService,
+            IActivityRepository activityRepository, 
+            ISessionRepository sessionRepository,
+            IConfiguration configuration)
     {
         _timeoutsRepository = timeoutsRepository;
+        _cryptoService = cryptoService;
         _activityRepository = activityRepository;
+        _sessionRepository = sessionRepository;
         _configuration = configuration;
-        _corsPolicy = new CorsPolicy();
     }
-    public bool ShouldReplay(string origin)
+
+    public bool ShouldReplayToOrigin(string origin)
     {   
         if(_timeoutsRepository.isTimeOut(origin)) return false;
-        var timeOutInMinutes = _configuration.GetValue<int>("AccessService:TimeOutInMinutes");
-        var allowedCount = _configuration.GetValue<int>("AccessService:AllowedCount");
-        var count = _activityRepository.GetAcitivityCountForLastNMinutes(origin, timeOutInMinutes);
+        var allowedTimeSpanInMinutes = _configuration.GetValue<int>("ClassConfig:AccessService:AllowedTimeSpanInMinutes");
+        var timeOutInMinutes = _configuration.GetValue<int>("ClassConfig:AccessService:TimeOutInMinutes");
+        var allowedCount = _configuration.GetValue<int>("ClassConfig:AccessService:AllowedCount");
+        var count = _activityRepository.GetAcitivityCountForLastNMinutes(origin, allowedTimeSpanInMinutes);
         if(count > allowedCount) _timeoutsRepository.setTimeOut(origin, timeOutInMinutes);
         return count <= allowedCount;
+    }
+
+    public int GetUserId(Token token)
+    {
+        return _sessionRepository.GetUserIdForSession(token.SessionId);
+    }
+
+    public bool VerifyToken(Token token)
+    {
+        //Console.WriteLine("token is not null:" + (token != null));
+        if (token == null) return false;
+        //Console.WriteLine("token is not expired:" + (token.ExpirationDate > DateTime.Now));
+        if (token.ExpirationDate < DateTime.Now) return false;
+        //Console.WriteLine("token is valid:" + _cryptoService.VerifyToken(token));
+        if(!_cryptoService.VerifyToken(token)) return false;
+        //Console.WriteLine("token is valid: Awsome");
+        return true;
+    }
+
+    public Token GetToken(int usedId)
+    {
+        var maxSessions = _configuration.GetValue<int>("ClassConfig:SessionService:SessionDurtionInMinutes");
+        var expirationDate = DateTime.Now.AddMinutes(maxSessions);
+        var ssessionId =_sessionRepository.CreateSession(usedId, expirationDate);
+        Token token = _cryptoService.GenerateToken(usedId, ssessionId, expirationDate);
+        return token;
+    }
+
+    public void RemoveSession(Token token){
+        _sessionRepository.DeleteSession(token.SessionId);
     }
 }
 

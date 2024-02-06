@@ -1,0 +1,17 @@
+dotnet build && dotnet ef migrations add 1.0.6 && dotnet ef database update && dotnet run
+dotnet test --logger "console;verbosity=detailed"
+
+budowanie projektu:
+(1) Backend:
+    dotnet publish --configuration Release
+
+(2) Frontend:
+    npm i && npm run build
+    w katalogu /dist/ zamienić w skrytpach typ z module na type="text/javascript" oraz 
+    zmienić strukturę pliku tak aby najpierw załadował <div id="root"> a później skrypt.
+
+(3) Cały projekt 
+    docker build -t projekt . && docker run -it -p 5000:5000 -p 3000:3000 projekt 
+
+Haslo:
+Aa!1zxcv

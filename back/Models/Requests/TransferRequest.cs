@@ -13,7 +13,9 @@ namespace projekt.Models.Requests
             Recipient = "";
             Value = 0;
             Title = "";
-            Token = new Token();
+            Token = new Token(){
+                Sign = ""
+            };
         }
         public required string AccountNumber { get; set; }
         public required string RecipientAccountNumber { get; set; }
@@ -27,7 +29,7 @@ namespace projekt.Models.Requests
             if(!Validator.validNumber(RecipientAccountNumber)) return "Recipient account number is not valid";
             if(!Validator.validName(Recipient)) return "Recipient name is not valid";
             if(!Validator.validText(Title)) return "Title is not valid";
-            if( Value <= 0) return "Value is not valid";
+            if(!Validator.validValue(Value)) return "Value is not valid";
             return "";
         }
     }

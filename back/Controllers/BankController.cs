@@ -4,7 +4,6 @@ using projekt.Services.Interfaces;
 using projekt.Models.Enums;
 using projekt.Models.Dtos;
 using projekt.Models.Responses;
-using projekt.Services.Interfaces;
 
 namespace projekt.Controllers;
 
@@ -30,22 +29,31 @@ public class BankController : ControllerBase
     {
         delay();
         var origin = getOrigin();
-        var response = validateRequest(request, origin);
+        var response = ValidateRequest(request, origin);
         response = response.Success ? _bankService.Login(request) : response;
         _activityService.LogActivity(ActivityType.Login, request.Email, origin, response.Success);
         return getResponse(response);
     }
 
-
+    [HttpPost("login-code-submit")]
+    public IActionResult LoginCodeSubmit([FromBody] CodeSubmitRequest request)
+    {
+        delay();
+        var origin = getOrigin();
+        var response = ValidateRequest(request, origin);
+        response = response.Success ? _bankService.LoginCodeSubmit(request) : response;
+        _activityService.LogActivity(ActivityType.CodeSubmit, request.Email, origin, response.Success);
+        return getResponse(response);
+    }
 
     [HttpPost("register")]
     public IActionResult register([FromBody] RegisterRequest request)
     {
         delay();
         var origin = getOrigin();
-        var response = validateRequest(request, origin);
+        var response = ValidateRequest(request, origin);
         response = response.Success ? _bankService.Register(request) : response;
-        _activityService.LogActivity(ActivityType.Register, request.Email,origin, response.Success);
+        _activityService.LogActivity(ActivityType.Register, request.Email, origin, response.Success);
         return getResponse(response);
     } 
 
@@ -54,9 +62,9 @@ public class BankController : ControllerBase
     {
         delay();
         var origin = getOrigin();
-        var response = validateRequest(request, origin);
+        var response = ValidateRequest(request, origin);
         response = response.Success ? _bankService.CodeSubmitRegister(request) : response;
-        _activityService.LogActivity(ActivityType.CodeSubmit, request.Email,origin, response.Success);
+        _activityService.LogActivity(ActivityType.CodeSubmit, request.Email, origin, response.Success);
         return getResponse(response);
     }
 
@@ -65,9 +73,9 @@ public class BankController : ControllerBase
     {
         delay();
         var origin = getOrigin();
-        var response = validateRequest(request, origin);
+        var response = ValidateRequest(request, origin);
         response = response.Success ? _bankService.ChangePasswordCodeRequest(request) : response;
-        _activityService.LogActivity(ActivityType.ChangePasswordCodeRequest, request.Email,origin, response.Success);
+        _activityService.LogActivity(ActivityType.ChangePasswordCodeRequest, request.Email, origin, response.Success);
         return getResponse(response);
     }
 
@@ -76,9 +84,9 @@ public class BankController : ControllerBase
     {
         delay();
         var origin = getOrigin();
-        var response = validateRequest(request, origin);
+        var response = ValidateRequest(request, origin);
         response = response.Success ? _bankService.CodeSubmit(request) : response;
-        _activityService.LogActivity(ActivityType.CodeSubmit, request.Email, origin,response.Success);
+        _activityService.LogActivity(ActivityType.CodeSubmit, request.Email, origin, response.Success);
         return getResponse(response);
     }
 
@@ -87,9 +95,20 @@ public class BankController : ControllerBase
     {
         delay();
         var origin = getOrigin();
-        var response = validateRequest(request, origin);
+        var response = ValidateRequest(request, origin);
         response = response.Success ? _bankService.ChangePassword(request) : response;
-        _activityService.LogActivity(ActivityType.ChangePassword, request.Email,origin, response.Success);
+        _activityService.LogActivity(ActivityType.ChangePassword, request.Email, origin, response.Success);
+        return getResponse(response);
+    }
+
+    [HttpPost("logout")]
+    public IActionResult Logout([FromBody] LogoutRequest request)
+    {
+        delay();
+        var origin = getOrigin();
+        var response = ValidateRequest(request, origin, request.Token);
+        response = response.Success ? _bankService.Logout(request) : response;
+        _activityService.LogActivity(ActivityType.Logout, origin, response.Success, origin: true);
         return getResponse(response);
     }
 
@@ -98,7 +117,7 @@ public class BankController : ControllerBase
     {
         delay();
         var origin = getOrigin();
-        var response = validateRequest(request, origin, request.Token);
+        var response = ValidateRequest(request, origin, request.Token);
         response = response.Success ? _bankService.NewTransfer(request) : response;
         _activityService.LogActivity(ActivityType.NewTransfer, request.AccountNumber, origin, response.Success);
         return getResponse(response);
@@ -109,9 +128,20 @@ public class BankController : ControllerBase
     {
         delay();
         var origin = getOrigin();
-        var response = validateRequest(request, origin, request.token);
+        var response = ValidateRequest(request, origin, request.Token);
         response = response.Success ? _bankService.GetAccount(request) : response;
-        _activityService.LogActivity(ActivityType.GetAccount, request.Email, origin, response.Success);
+        _activityService.LogActivity(ActivityType.GetAccount, origin, response.Success, origin: true);
+        return getResponse(response);
+    }
+
+    [HttpPost("origins")]
+    public IActionResult GetRelevantOrigins([FromBody] ReleventOriginsRequest request)
+    {
+        delay();
+        var origin = getOrigin();
+        var response = ValidateRequest(request, origin, request.Token);
+        response = response.Success ? _bankService.GetRelevantOrigins(request.Token) : response;
+        _activityService.LogActivity(ActivityType.GetRelevantOrigins, origin, response.Success);
         return getResponse(response);
     }
 
@@ -121,21 +151,21 @@ public class BankController : ControllerBase
     }
 
     private string getOrigin(){
-        return Request.Headers["Origin"].ToString() ?? "unknown";
+        return Request.Headers.Origin.ToString() ?? "unknown";
     }
 
-    private BasicResponse validateRequest(BasicRequest request, string origin, Token token){
-        var response = validateRequest(request, origin);
-        var tokenIsValid = _bankService.ValidateToken(token);
+    private BasicResponse ValidateRequest(BasicRequest request, string origin, Token token){
+        var response = ValidateRequest(request, origin);
+        var tokenIsValid = _accessService.VerifyToken(token);
         response.Success = response.Success && tokenIsValid;
         if (!tokenIsValid) response.Message = "Authentication failed";
         return response;
     }
 
-    private BasicResponse validateRequest(BasicRequest request, string origin){
+    private BasicResponse ValidateRequest(BasicRequest request, string origin){
         var validatorMessage = request.IsValid();
         return new BasicResponse(){
-            Success = _accessService.ShouldReplay(origin) && string.IsNullOrEmpty(validatorMessage),
+            Success = _accessService.ShouldReplayToOrigin(origin) && string.IsNullOrEmpty(validatorMessage),
             Message = validatorMessage
         };
     }

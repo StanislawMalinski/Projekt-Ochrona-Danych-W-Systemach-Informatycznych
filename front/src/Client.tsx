@@ -1,5 +1,5 @@
 import config from '../clientconfig.json';
-import { getToken, hashPassword, saveServerPubKey } from './utils/Cipher';
+import {getToken} from './utils/Cipher';
 
 var baseUrl = '';
 var accessControlAllowOrigin = '';
@@ -24,6 +24,36 @@ function login(body: any) {
         if (response.status === 200) {
             return response.json();
         }
+    });
+}
+
+
+function logincodesubmit(body: any) {
+    return fetch(baseUrl + config.urls.logincodesubmit, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': accessControlAllowOrigin
+        },
+        body: JSON.stringify(body)
+    }).then((response) => {
+        if (response.status === 200) {
+            return response.json();
+        }
+    });
+}
+
+
+function logout() {
+    var body = {token: getToken()};
+    return fetch(baseUrl + config.urls.logout, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': accessControlAllowOrigin,
+            'Authorization': body.token
+        },
+        body: JSON.stringify(body)
     });
 }
 
@@ -56,7 +86,6 @@ function submitregistrationcode(body: any) {
 }
 
 function passwordchangerequestcode(body: any) {
-    body.token = getToken();
     return fetch(baseUrl + config.urls.passwordchangerequestcode, {
         method: 'POST',
         headers: {
@@ -72,7 +101,6 @@ function passwordchangerequestcode(body: any) {
 }
 
 function codesubmit(body: any) {
-    body.token = getToken();
     return fetch(baseUrl + config.urls.codesubmit, {
         method: 'POST',
         headers: {
@@ -87,10 +115,8 @@ function codesubmit(body: any) {
     });
 }
 
-// require password
 function passwordchange(body: any) {
-    body.token = getToken();
-    body.password = hashPassword(body.password)
+    console.log(body);
     return fetch(baseUrl + config.urls.passwordchange, {
         method: 'POST',
         headers: {
@@ -107,8 +133,6 @@ function passwordchange(body: any) {
 
 function transfer(body: any) {
     body.token = getToken();
-    (body);
-    (getToken());
     return fetch(baseUrl + config.urls.transfer, {
         method: 'POST',
         headers: {
@@ -123,8 +147,8 @@ function transfer(body: any) {
     });
 }
 
-function account(body: any) {
-    body.token = getToken();
+function account() {
+    var body = {token: getToken()};
     return fetch(baseUrl + config.urls.account, {
         method: 'POST',
         headers: {
@@ -135,22 +159,6 @@ function account(body: any) {
     }).then((response) => {;
         if (response.status === 200) {
             return response.json();
-        }
-    });
-}
-
-function getPubKey() {
-    return fetch(baseUrl + config.urls.pubkey, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': accessControlAllowOrigin
-        }
-    }).then((response) => {
-        if (response.status === 200) {;
-            response.text().then((text) => {
-                saveServerPubKey(text);
-            });
         }
     });
 }
@@ -172,6 +180,8 @@ function getactivities(email: string) {
 }
 
 export {login,
+        logincodesubmit,
+        logout,
         register,
         submitregistrationcode,
         passwordchangerequestcode, 
@@ -179,7 +189,6 @@ export {login,
         passwordchange,
         transfer, 
         account, 
-        getPubKey,
         getactivities}
 
 

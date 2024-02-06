@@ -35,10 +35,11 @@ namespace projekt.Db.Repository
         public int GetAcitivityCountForLastNMinutes(string origin, int minutes)
         {
             cleanUp();
-            return _bankDbContext.Activities
-                .Where(a => a.AssociatedEmail == origin)
-                .Where(a => a.Date >= DateTime.Now.AddMinutes(-minutes))
+            var date = DateTime.Now.AddMinutes(-1 * minutes);
+            var count = _bankDbContext.Activities
+                .Where(a => a.Origin == origin && a.Date > date)
                 .Count();
+            return count;
         }
 
         private void cleanUp(){
@@ -47,6 +48,16 @@ namespace projekt.Db.Repository
                 .ToList()
                 .ForEach(a => _bankDbContext.Activities.Remove(a));
             _bankDbContext.SaveChanges();
+        }
+
+        public List<string> GetRelevantOrigins(string email)
+        {
+            var origins = _bankDbContext.Activities
+                .Where(a => a.AssociatedEmail == email)
+                .Select(a => a.Origin)
+                .Distinct()
+                .ToList();
+            return origins != null ? origins : new List<string>(); 
         }
     }
 }

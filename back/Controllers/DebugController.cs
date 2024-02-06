@@ -7,11 +7,16 @@ using projekt.Models.Enums;
 public class DebugController : ControllerBase
 {
     private readonly IDebugSerivce _debugService;
+    private readonly ICryptoService _cryptoService;
+
     private readonly IActivityService _activityService;
 
-    public DebugController(IDebugSerivce debugService, IActivityService activityService)
+    public DebugController(IDebugSerivce debugService, 
+        ICryptoService cryptoService,
+        IActivityService activityService)
     {
         _debugService = debugService;
+        _cryptoService = cryptoService;
         _activityService = activityService;
     }
 
@@ -22,20 +27,27 @@ public class DebugController : ControllerBase
         return Ok();
     }
 
-
-    [HttpGet("token")]
-    public IActionResult GetToken([FromQuery] string accountNumber)
+    //[HttpPost("clean-db")]
+    public IActionResult CleanDb()
     {
-        return Ok(CryptoService.GenerateToken(accountNumber));
+        _debugService.CleanDatabase();
+        return Ok();
     }
 
-    [HttpPost("vtoken")]
+    //[HttpGet("token")]
+    public IActionResult GetToken([FromQuery] int usedId)
+    {
+        DateTime date = DateTime.Now.AddDays(1);
+        return Ok(_cryptoService.GenerateToken(usedId,1, date));
+    }
+
+    //[HttpPost("vtoken")]
     public IActionResult VerifyToken([FromBody] Token token)
     {
-        return Ok(CryptoService.verifyToken(token));
+        return Ok(_cryptoService.VerifyToken(token));
     }
 
-    [HttpGet("activities")]
+    //[HttpGet("activities")]
     public IActionResult GetActivities([FromQuery] string email)
     {
         var origin = Request.Headers["Origin"].ToString() ?? "unknown";
